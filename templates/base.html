@@ -1,22 +1,20 @@
-{% set hero = hero if hero is defined else 'Pugna' %}<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}DOTA_MASTER — Статистика игр{% endblock %}</title>
-        <meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)">
-        <meta name="theme-color" content="#0d0d12" media="(prefers-color-scheme: dark)">
+        <meta id="theme-color" name="theme-color" content="#0d0d12">
         <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%94%3C/text%3E%3C/svg%3E">
-        <!-- Light theme CSS -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/dota-light-theme.css', v='6') }}">
-        <!-- Dark fantasy palette is the default; the toggle can switch to parchment light. -->
-        <link id="dark-theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/dota.css', v='9') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/dota-modern.css', v='1') }}">
+        <!-- One shared layout stylesheet; themes change color tokens only. -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/dota.css', v='10') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/dota-modern.css', v='2') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/match-detail.css', v='1') }}">
         {% block extra_css %}{% endblock %}
 </head>
 <body>
     <header class="dota-header">
-        <a href="/" class="dota-logo">
+        <a href="{{ url_for('index') }}" class="dota-logo">
             <div class="dota-logo-icon">⚔️</div>
             <div>
                 <div class="dota-logo-text">DOTA_MASTER</div>
@@ -25,15 +23,14 @@
         </a>
         <nav class="nav-bar">
             {% set path = request.path %}
-            <a href="/" class="nav-link{% if path == '/' %} active{% endif %}">📊 Дашборд</a>
-            <a href="/games" class="nav-link{% if path.startswith('/games') %} active{% endif %}">📋 Игры</a>
-            <a href="/fresh" class="nav-link{% if path.startswith('/fresh') %} active{% endif %}">🔄 Свежие</a>
-            <a href="/errors" class="nav-link{% if path.startswith('/errors') %} active{% endif %}">⚠️ Ошибки</a>
-            <a href="/macro" class="nav-link{% if path.startswith('/macro') %} active{% endif %}">📈 Анализ</a>
-            <a href="/report" class="nav-link{% if path.startswith('/report') %} active{% endif %}">📋 Отчёт</a>
-            <a href="/heroes" class="nav-link{% if path.startswith('/heroes') %} active{% endif %}">👹 Герои</a>
-            <a href="/hero/{{ hero }}" class="nav-link{% if path.startswith('/hero') %} active{% endif %}">👹 {{ hero }}</a>
-            <a href="/api" class="nav-link{% if path.startswith('/api') %} active{% endif %}">📖 API</a>
+            <a href="{{ url_for('index') }}" class="nav-link{% if path == '/' %} active{% endif %}">📊 Дашборд</a>
+            <a href="{{ url_for('games_page') }}" class="nav-link{% if path.startswith('/games') %} active{% endif %}">📋 Игры</a>
+            <a href="{{ url_for('fresh_page') }}" class="nav-link{% if path.startswith('/fresh') %} active{% endif %}">🔄 Свежие</a>
+            <a href="{{ url_for('errors_page') }}" class="nav-link{% if path.startswith('/errors') %} active{% endif %}">⚠️ Ошибки</a>
+            <a href="{{ url_for('macro_page') }}" class="nav-link{% if path.startswith('/macro') %} active{% endif %}">📈 Анализ</a>
+            <a href="{{ url_for('report_page') }}" class="nav-link{% if path.startswith('/report') %} active{% endif %}">📋 Отчёт</a>
+            <a href="{{ url_for('heroes_page') }}" class="nav-link{% if path.startswith('/heroes') %} active{% endif %}">👹 Герои</a>
+            <a href="{{ url_for('api_page') }}" class="nav-link{% if path.startswith('/api') %} active{% endif %}">📖 API</a>
         </nav>
         <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему" title="Переключить тему (Ctrl+Shift+T)">
             <span class="theme-icon-sun" aria-hidden="true">☀️</span>
@@ -59,13 +56,7 @@
             const THEME_KEY = 'dota_master_theme';
             const toggleBtn = document.getElementById('theme-toggle');
             const html = document.documentElement;
-            const darkCss = document.getElementById('dark-theme-css');
-            
-            function setDarkCss(enabled) {
-                if (darkCss) {
-                    darkCss.media = enabled ? 'all' : 'not all';
-                }
-            }
+            const themeColorMeta = document.getElementById('theme-color');
             
             function updateToggleIcon() {
                 const isDark = html.getAttribute('data-theme') === 'dark';
@@ -79,7 +70,9 @@
             
             function applyTheme(theme) {
                 html.setAttribute('data-theme', theme);
-                setDarkCss(theme === 'dark');
+                if (themeColorMeta) {
+                    themeColorMeta.content = theme === 'dark' ? '#0d0d12' : '#f4f0e6';
+                }
                 updateToggleIcon();
             }
             

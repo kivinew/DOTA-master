@@ -4,6 +4,17 @@
 import os
 import json as _json
 
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _item_id(value) -> int:
+    """Normalize OpenDota IDs, which may arrive as either ints or strings."""
+    try:
+        return int(value or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
 # ── Загрузка кэша айтемов ─────────────────────────────────────────────────────
 
 _ITEM_CACHE: dict[int, str] = {}
@@ -11,7 +22,7 @@ _ITEM_CACHE: dict[int, str] = {}
 
 def _load_item_cache() -> dict[int, str]:
     """Загрузить маппинг id → slug из data/items_cache.json (если есть)."""
-    cache_path = os.path.join("data", "items_cache.json")
+    cache_path = os.path.join(PROJECT_ROOT, "data", "items_cache.json")
     if not os.path.exists(cache_path):
         return {}
     try:
@@ -36,7 +47,7 @@ _ITEM_CACHE = _load_item_cache()
 
 def _load_ability_cache() -> dict:
     """Загрузить маппинг ability_id -> slug из data/ability_id_to_slug.json."""
-    cache_path = os.path.join("data", "ability_id_to_slug.json")
+    cache_path = os.path.join(PROJECT_ROOT, "data", "ability_id_to_slug.json")
     if not os.path.exists(cache_path):
         return {}
     try:
@@ -76,6 +87,7 @@ NEUTRAL_ITEMS: dict[int, str] = {
 
 def item_name(item_id: int) -> str:
     """Человекочитаемое название предмета: из кэша, нейтральный либо Item_{id}."""
+    item_id = _item_id(item_id)
     name = _ITEM_CACHE.get(item_id)
     if name:
         return str(name).replace("_", " ").title()
@@ -86,6 +98,7 @@ def item_name(item_id: int) -> str:
 
 def neutral_item_name(neutral_id: int) -> str:
     """Человекочитаемое название нейтрального предмета либо Neutral_{id}."""
+    neutral_id = _item_id(neutral_id)
     name = NEUTRAL_ITEMS.get(neutral_id) or _ITEM_CACHE.get(neutral_id)
     if name:
         name = str(name)
@@ -111,35 +124,28 @@ def hero_item_name(item) -> str:
 
 
 def item_img_url(item_id: int) -> str:
-    """Получить URL иконки предмета.
+    """Return a local item icon when available, otherwise a Steam CDN URL.
 
-    Порядок:
-      1. Локальный файл по slug из items_cache.json
-      2. Локальный файл по числовому ID
-      3. Fallback: Steam CDN (по slug или ID)
+    IDs are normalized because match payloads may serialize them as strings.
+    Paths are resolved from the repository root, independent of the caller's cwd.
+    Templates provide a local placeholder if a CDN asset is missing or retired.
     """
-    if not item_id:
+    item_id = _item_id(item_id)
+    if item_id <= 0:
         return ""
 
-    # 1. Slug из кэша
     slug = _ITEM_CACHE.get(item_id)
     if slug:
-        local_path = os.path.join("static", "items", f"{slug}.png")
-        if os.path.exists(local_path):
+        local_slug_path = os.path.join(PROJECT_ROOT, "static", "items", f"{slug}.png")
+        if os.path.isfile(local_slug_path):
             return f"/static/items/{slug}.png"
-        # 2. Локальный файл по ID (случай если slug-файл не скачан, но есть ID-файл)
-        local_id_path = os.path.join("static", "items", f"{item_id}.png")
-        if os.path.exists(local_id_path):
-            return f"/static/items/{item_id}.png"
-        # 3. Steam CDN по slug
-        return f"https://cdn.cloudflare.steamstatic.com/apps/dota2/images/items/{slug}_lg.png"
 
-    # Нет в кэше — пробуем локальный файл по ID
-    local_id_path = os.path.join("static", "items", f"{item_id}.png")
-    if os.path.exists(local_id_path):
+    local_id_path = os.path.join(PROJECT_ROOT, "static", "items", f"{item_id}.png")
+    if os.path.isfile(local_id_path):
         return f"/static/items/{item_id}.png"
 
-    # Fallback: Steam CDN по ID (может быть broken)
+    if slug:
+        return f"https://cdn.cloudflare.steamstatic.com/apps/dota2/images/items/{slug}_lg.png"
     return f"https://cdn.cloudflare.steamstatic.com/apps/dota2/images/items/{item_id}_lg.png"
 
 

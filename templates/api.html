@@ -10,7 +10,7 @@
         <div class="dota-section">
             <div class="dota-section-title">🌐 Базовый URL</div>
             <div class="code-block">
-                <span class="cmd">http://localhost:9999/api</span>
+                <span class="cmd">{{ request.host_url.rstrip('/') }}/api</span>
             </div>
             <p class="muted fs-sm mt-sm">
                 Все эндпоинты возвращают JSON. Ответы имеют формат <code>{"status": "success", ...}</code> или <code>{"status": "error", "message": "..."}</code>.
@@ -32,7 +32,7 @@
   <span class="key">"games"</span>: [
     {
       <span class="key">"date"</span>: <span class="string">"2026-09-13T22:39:17"</span>,
-      <span class="key">"hero"</span>: <span class="string">"Pugna"</span>,
+      <span class="key">"hero"</span>: <span class="string">"Invoker"</span>,
       <span class="key">"role"</span>: <span class="string">"offlane"</span>,
       <span class="key">"result"</span>: <span class="string">"win"</span>,
       <span class="key">"kills"</span>: <span class="number">12</span>,
@@ -53,10 +53,10 @@
                 </div>
                 <div class="endpoint-desc">Игры конкретного героя</div>
                 <div class="endpoint-example">
-GET /api/games/Pugna →
+GET /api/games/Invoker →
 {
   <span class="key">"status"</span>: <span class="string">"success"</span>,
-  <span class="key">"hero"</span>: <span class="string">"Pugna"</span>,
+  <span class="key">"hero"</span>: <span class="string">"Invoker"</span>,
   <span class="key">"games"</span>: [...],
   <span class="key">"total"</span>: <span class="number">36</span>
 }
@@ -91,10 +91,10 @@ GET /api/stats →
                 </div>
                 <div class="endpoint-desc">Статистика по герою</div>
                 <div class="endpoint-example">
-GET /api/hero/Pugna/stats →
+GET /api/hero/Invoker/stats →
 {
   <span class="key">"stats"</span>: {
-    <span class="key">"hero"</span>: <span class="string">"Pugna"</span>,
+    <span class="key">"hero"</span>: <span class="string">"Invoker"</span>,
     <span class="key">"games"</span>: <span class="number">36</span>,
     <span class="key">"wins"</span>: <span class="number">22</span>,
     <span class="key">"losses"</span>: <span class="number">14</span>,
@@ -134,7 +134,7 @@ GET /api/hero/Pugna/stats →
             <div class="dota-section-title">📋 Параметры</div>
             <div class="code-block">
                 <span class="cmd">&lt;hero&gt;</span> — название героя (латиницей)<br>
-                Примеры: Pugna, Naga Siren, Weaver, Anti-Mage, Lich
+                Примеры: Invoker, Naga Siren, Weaver, Anti-Mage, Lich
             </div>
         </div>
 
@@ -143,7 +143,7 @@ GET /api/hero/Pugna/stats →
             <div class="code-block">
                 <span class="cmd">cd E:\DOWNLOADS\CREATIVE\PYTHON\GitHub\DOTA_MASTER</span><br>
                 <span class="cmd">python app.py</span><br><br>
-                Откройте: <span class="cmd">http://localhost:9999</span><br>
+                Откройте: <span class="cmd">{{ request.host_url }}</span><br>
                 В сети: <span class="cmd">http://&lt;ваш-ip&gt;:9999</span>
             </div>
             <p class="muted fs-sm mt-sm">

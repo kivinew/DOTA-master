@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Иконка предмета недоступна">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#39352a"/>
+      <stop offset="1" stop-color="#151719"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="62" height="62" rx="9" fill="url(#g)" stroke="#c6a455" stroke-width="2"/>
+  <path d="M32 9 50 32 32 55 14 32Z" fill="none" stroke="#c6a455" stroke-width="2" opacity=".7"/>
+  <path d="m23 23 18 18m0-18L23 41" stroke="#e5d7af" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+</svg>
