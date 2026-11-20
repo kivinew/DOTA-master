@@ -9,8 +9,8 @@
         <h1 id="dashboard-title">Каждый матч<br><em>рассказывает историю.</em></h1>
         <p>Разбирай победы, находи точки роста и возвращайся на поле боя сильнее.</p>
         <div class="dashboard-actions">
-            <a href="/games" class="btn btn-primary">⚔ Матчи и история <span aria-hidden="true">→</span></a>
-            <a href="/report" class="btn btn-ghost">✦ Полный анализ</a>
+            <a href="{{ url_for('games_page') }}" class="btn btn-primary">⚔ Матчи и история <span aria-hidden="true">→</span></a>
+            <a href="{{ url_for('report_page') }}" class="btn btn-ghost">✦ Полный анализ</a>
         </div>
     </div>
     <div class="dashboard-hero-mark" aria-hidden="true"><span>✦</span></div>
@@ -18,7 +18,7 @@
 </section>
 <div class="dashboard-section-heading">
     <div><span class="eyebrow">ТВОИ ПОКАЗАТЕЛИ</span><h2>Обзор статистики</h2></div>
-    <a class="text-link" href="/games">Все матчи <span aria-hidden="true">↗</span></a>
+    <a class="text-link" href="{{ url_for('games_page') }}">Все матчи <span aria-hidden="true">↗</span></a>
 </div>
 <!-- Статистика -->
 {% if stats and stats.total_games > 0 %}

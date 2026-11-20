@@ -628,7 +628,7 @@ def api_macro():
 
 @app.route("/match/<int:match_id>")
 def match_detail_page(match_id):
-    from analysis.macro_analyzer import analyze_match, get_match_details, _hero_name, get_player_slots
+    from analysis.macro_analyzer import analyze_match, get_match_details, get_player_slots, _hero_name
     from analysis.stats_engine import get_games
     
     # Найти матч в локальной БД
@@ -638,15 +638,11 @@ def match_detail_page(match_id):
             local_match = g
             break
     
-    # Определить player_slot
-    player_slot = None
-    try:
-        slots = get_player_slots(limit=100)
-        player_slot = slots.get(match_id)
-    except Exception:
-        pass
-    
+    # Детали загружаем один раз и используем повторно в анализаторе.
+    # Ранее route сначала запрашивал список недавних матчей, затем детали,
+    # а analyze_match ещё раз скачивал те же детали.
     d = get_match_details(match_id)
+    player_slot = None
     
     # Наш игрок в матче: сначала ищем по account_id, затем по hero_id из локальной БД
     if d:
@@ -661,8 +657,16 @@ def match_detail_page(match_id):
                     if pl.get("hero_id") == hero_id:
                         player_slot = pl.get("player_slot")
                         break
+
+    # Редкий fallback для матчей, где OpenDota скрыл account_id, а локальная
+    # запись не содержит hero_id. Не выполняем запрос списка матчей в обычном случае.
+    if d and player_slot is None and not (local_match and local_match.get("hero_id")):
+        try:
+            player_slot = get_player_slots(limit=100).get(match_id)
+        except Exception:
+            pass
     
-    analysis = analyze_match(match_id, player_slot=player_slot)
+    analysis = analyze_match(match_id, player_slot=player_slot, match_data=d)
     if not analysis:
         return "Матч не найден", 404
 

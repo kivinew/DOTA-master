@@ -318,13 +318,17 @@ def analyze_items(items: list[int], neutral: int = 0, hero_id: int = 0) -> dict:
 
 # ── Основной анализ матча ────────────────────────────────────────────────────
 
-def analyze_match(match_id: int, account_id: int = ACCOUNT_ID, player_slot: Optional[int] = None) -> Optional[dict]:
-    """Полный анализ одного матча с вкладом в команду и сравнением.
+_MATCH_DETAILS_UNSET = object()
 
-    Один запрос к /matches/{id}; игрок ищется по account_id,
-    для анонимных матчей — fallback на слот из recentMatches.
-    """
-    d = get_match_details(match_id)
+
+def analyze_match(
+    match_id: int,
+    account_id: int = ACCOUNT_ID,
+    player_slot: Optional[int] = None,
+    match_data=_MATCH_DETAILS_UNSET,
+) -> Optional[dict]:
+    """Analyze one match; callers may pass already-fetched details to avoid duplicate API calls."""
+    d = get_match_details(match_id) if match_data is _MATCH_DETAILS_UNSET else match_data
     if not d:
         return None
     p = None

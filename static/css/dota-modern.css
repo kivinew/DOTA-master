@@ -1,7 +1,22 @@
-/* DOTA_MASTER — shared visual polish for both themes. */
-:root {
+/* DOTA_MASTER — shared layout. Theme switching changes these color tokens only. */
+:root, [data-theme="dark"] {
     --dota-accent: #d2ad58;
-    --dota-surface-glass: rgba(19, 21, 24, .82);
+    --modern-header-bg: rgba(13, 15, 17, .90);
+    --modern-header-border: rgba(208, 171, 79, .38);
+    --modern-panel-bg: linear-gradient(145deg, rgba(28, 30, 32, .97), rgba(18, 20, 22, .98));
+    --modern-panel-border: rgba(199, 176, 125, .16);
+    --modern-ghost-bg: rgba(20, 21, 21, .45);
+    --modern-ghost-color: #eee9dc;
+    --modern-ghost-border: rgba(236, 224, 192, .28);
+}
+[data-theme="light"] {
+    --modern-header-bg: rgba(250, 249, 247, .94);
+    --modern-header-border: rgba(150, 115, 45, .30);
+    --modern-panel-bg: linear-gradient(145deg, rgba(255, 253, 249, .98), rgba(246, 242, 232, .98));
+    --modern-panel-border: rgba(135, 105, 50, .22);
+    --modern-ghost-bg: rgba(255, 255, 255, .78);
+    --modern-ghost-color: #342b1b;
+    --modern-ghost-border: rgba(135, 105, 50, .30);
 }
 
 html { scroll-behavior: smooth; }
@@ -35,8 +50,8 @@ body::after {
 
 .dota-header {
     padding: .72rem clamp(1rem, 3.2vw, 3.5rem);
-    background: rgba(13, 15, 17, .90);
-    border-bottom: 1px solid rgba(208, 171, 79, .38);
+    background: var(--modern-header-bg);
+    border-bottom: 1px solid var(--modern-header-border);
     box-shadow: 0 10px 34px rgba(0, 0, 0, .26);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -111,7 +126,7 @@ body::after {
     box-shadow: 0 7px 24px rgba(196, 156, 67, .18);
 }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(196, 156, 67, .28); }
-.btn-ghost { color: #eee9dc; background: rgba(20, 21, 21, .45); border-color: rgba(236, 224, 192, .28); }
+.btn-ghost { color: var(--modern-ghost-color); background: var(--modern-ghost-bg); border-color: var(--modern-ghost-border); }
 .btn-ghost:hover { color: #e2c777; border-color: #c9a84c; }
 .dashboard-hero-mark {
     width: clamp(170px, 25vw, 330px); aspect-ratio: 1; position: absolute; right: 7%; top: 50%;
@@ -141,16 +156,16 @@ body::after {
 }
 .stat-card {
     padding: 1.35rem 1.25rem;
-    background: linear-gradient(145deg, rgba(28, 30, 32, .95), rgba(18, 20, 22, .97));
-    border-color: rgba(199, 176, 125, .16);
+    background: var(--modern-panel-bg);
+    border-color: var(--modern-panel-border);
 }
 .stat-card::before { height: 2px; opacity: .85; }
 .stat-card .stat-label { letter-spacing: .14em; }
 .stat-card .stat-value { font-size: clamp(1.8rem, 4vw, 2.4rem); }
 .dota-section {
     padding: clamp(1rem, 2.4vw, 1.7rem);
-    background: linear-gradient(145deg, rgba(27, 29, 30, .96), rgba(17, 19, 21, .96));
-    border-color: rgba(201, 168, 76, .16);
+    background: var(--modern-panel-bg);
+    border-color: var(--modern-panel-border);
     box-shadow: 0 14px 36px rgba(0, 0, 0, .16);
 }
 .dota-section-title { font-size: .94rem; letter-spacing: .025em; }

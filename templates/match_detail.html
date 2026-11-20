@@ -58,12 +58,6 @@
         {% set mvp_team = "Radiant" if match.mvp_radiant else ("Dire" if match.mvp_dire else "—") %}
     </div>
 
-    <div class="draft-score">
-        <span class="team-score radiant{% if match.radiant_win %} won{% endif %}">{{ match.radiant_score | default(0, true) }}</span>
-        <span class="score-vs">:</span>
-        <span class="team-score dire{% if not match.radiant_win %} won{% endif %}">{{ match.dire_score | default(0, true) }}</span>
-    </div>
-
     <div class="draft-teams">
         <div class="draft-team radiant">
             <div class="draft-heroes">
@@ -89,7 +83,9 @@
                                         {% set item_id = item %}
                                         {% set item_title = hero_item_name(item) %}
                                     {% endif %}
-                                    <img src="{{ item_img_url(item_id) }}" class="draft-item-img" title="{{ item_title }}">
+                                    <span class="item-tooltip" data-tooltip="{{ item_title }}" title="{{ item_title }}" tabindex="0" role="img" aria-label="{{ item_title }}">
+                                        <img src="{{ item_img_url(item_id) }}" class="draft-item-img" alt="{{ item_title }}" loading="lazy" onerror="this.onerror=null;this.src='{{ url_for('static', filename='items/item_placeholder.svg') }}';">
+                                    </span>
                                 {% endfor %}
                             </div>
                             {% endif %}
@@ -122,7 +118,9 @@
                                         {% set item_id = item %}
                                         {% set item_title = hero_item_name(item) %}
                                     {% endif %}
-                                    <img src="{{ item_img_url(item_id) }}" class="draft-item-img" title="{{ item_title }}">
+                                    <span class="item-tooltip" data-tooltip="{{ item_title }}" title="{{ item_title }}" tabindex="0" role="img" aria-label="{{ item_title }}">
+                                        <img src="{{ item_img_url(item_id) }}" class="draft-item-img" alt="{{ item_title }}" loading="lazy" onerror="this.onerror=null;this.src='{{ url_for('static', filename='items/item_placeholder.svg') }}';">
+                                    </span>
                                 {% endfor %}
                             </div>
                             {% endif %}
@@ -135,36 +133,38 @@
 </div>
 {% endif %}
 
-<!-- Контрптик: герои, контрирующие твоего героя (из вражеской команды) -->
+<!-- Компактная сводка контрпика -->
 {% set counter_list = counter_list or get_counter_heroes(match.hero_name) %}
 {% set primary = primary or get_primary_counter(match.hero_name) %}
 {% if counter_list %}
-<div class="dota-section">
-    <div class="dota-section-title">🎯 Контрптик</div>
-    <p class="muted">Основные герои, контрирующие твоего героя (по материалам проекта и игры).</p>
-
-    <div class="stat-card">
-        <div class="stat-label">Твой герой</div>
-        <div class="stat-value">{{ match.hero_name }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Контрптик</div>
-        <div class="stat-value">{{ primary }}</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Почему</div>
-        <div class="stat-sub">{{ counter_note(match.hero_name) }}</div>
-    </div>
-
-    <p class="muted">Вражеские герои, контрирующие твоего героя:</p>
-    <div class="counter-heroes">
-    {% for h in counter_list %}
-        <div class="counter-hero">
-            <img src="{{ hero_img_url(h) }}" alt="{{ h }}">
-            <span>{{ h }}</span>
+<div class="dota-section counter-section">
+    <div class="dota-section-title">🎯 Контрпик</div>
+    <div class="counter-matchup">
+        <div class="counter-matchup-hero">
+            <img src="{{ hero_img_url(match.hero_name) }}" alt="{{ match.hero_name }}" loading="lazy">
+            <span><small>ТВОЙ ГЕРОЙ</small><strong>{{ match.hero_name }}</strong></span>
         </div>
-    {% endfor %}
+        <span class="counter-matchup-arrow" aria-hidden="true">⟶</span>
+        <div class="counter-matchup-hero is-counter">
+            <img src="{{ hero_img_url(primary) }}" alt="{{ primary }}" loading="lazy">
+            <span><small>КОНТРПИК</small><strong>{{ primary }}</strong></span>
+        </div>
+        <p class="counter-matchup-note">{{ counter_note(match.hero_name) }}</p>
     </div>
+    {% set other_counters = counter_list | reject('equalto', primary) | list %}
+    {% if other_counters %}
+    <div class="counter-alternatives">
+        <span class="muted fs-xs">Ещё варианты</span>
+        <div class="counter-heroes">
+        {% for h in other_counters %}
+            <div class="counter-hero" title="{{ h }}">
+                <img src="{{ hero_img_url(h) }}" alt="" loading="lazy">
+                <span>{{ h }}</span>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endif %}
 
@@ -197,9 +197,10 @@
     <div class="dota-section-title">🎒 Айтемы</div>
     <div class="item-list">
         {% for item in match.item_build['items'] %}
-        {% if item.id %}
-        <span class="item-badge">
-            <img src="{{ item_img_url(item.id | int) }}" alt="{{ item.name }}" title="{{ item.name }}">
+        {% if item.id | int > 0 %}
+        {% set item_title = item.name or item_name(item.id | int) %}
+        <span class="item-badge item-tooltip" data-tooltip="{{ item_title }}" title="{{ item_title }}" tabindex="0" role="img" aria-label="{{ item_title }}">
+            <img src="{{ item_img_url(item.id) }}" alt="{{ item_title }}" loading="lazy" onerror="this.onerror=null;this.src='{{ url_for('static', filename='items/item_placeholder.svg') }}';">
         </span>
         {% endif %}
         {% endfor %}

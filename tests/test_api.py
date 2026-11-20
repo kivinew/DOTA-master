@@ -42,6 +42,41 @@ def _client():
     return webapp.app.test_client()
 
 
+def test_match_page_fetches_details_only_once(monkeypatch):
+    from analysis import macro_analyzer
+
+    calls = []
+    monkeypatch.setattr(stats_engine, "get_games", lambda: [])
+    monkeypatch.setattr(macro_analyzer, "get_match_details", lambda match_id: calls.append(match_id) or None)
+    response = _client().get("/match/9098079575")
+    assert response.status_code == 404
+    assert calls == [9098079575]
+
+
+def test_games_and_errors_pages_are_reachable():
+    client = _client()
+    for path in ("/games", "/errors"):
+        response = client.get(path)
+        assert response.status_code == 200
+        assert response.mimetype == "text/html"
+
+
+def test_dashboard_nav_has_no_pugna_shortcut(monkeypatch):
+    monkeypatch.setattr(webapp, "load_fresh_matches", lambda: {"fresh_matches": [], "account_id": None})
+    html = _client().get("/").get_data(as_text=True)
+    nav = html.split("<nav class=\"nav-bar\">", 1)[1].split("</nav>", 1)[0]
+    assert 'href="/games"' in nav
+    assert 'href="/errors"' in nav
+    assert "/hero/Pugna" not in nav
+
+
+def test_theme_switch_uses_one_layout_stylesheet(monkeypatch):
+    monkeypatch.setattr(webapp, "load_fresh_matches", lambda: {"fresh_matches": [], "account_id": None})
+    html = _client().get("/").get_data(as_text=True)
+    assert "css/dota.css" in html
+    assert "dota-light-theme.css" not in html
+
+
 def test_api_games_pagination():
     d = _client().get("/api/games?page=1&per_page=5").get_json()
     assert d["status"] == "success"
