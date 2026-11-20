@@ -1,0 +1,1946 @@
+/* =========================================================================
+   DOTA_MASTER - Modern Light Theme
+   Inspired by Vercel/Notion design systems
+   - Clean warm neutrals instead of harsh parchment
+   - Proper contrast for readability
+   - Consistent CSS variables for theme switching
+   ========================================================================= */
+
+:root {
+  /* Base colors - Warm neutral palette */
+  --dota-bg: #faf9f7;
+  --dota-bg-surface: #fdfcfb;
+  --dota-bg-card: #faf9f7;
+  --dota-bg-card-hover: #f5f3f0;
+  --dota-border: #e8e6e3;
+  --dota-border-light: #d8d6d1;
+  --dota-border-subtle: rgba(232, 230, 227, 0.3);
+  
+  /* Text colors - Warm hierarchy */
+  --dota-text: #2d2820;
+  --dota-text-muted: #6b5d45;
+  --dota-text-secondary: #8a7d6a;
+  --dota-text-tertiary: #a39e98;
+  
+  /* Gold accent - Softened warm gold (not harsh) */
+  --dota-gold: #a68a2e;
+  --dota-gold-dim: #8a7220;
+  --dota-gold-light: #c4ad58;
+  
+  /* Status colors - Soft variants */
+  --dota-green: #5a8a4a;
+  --dota-red: #924a4a;
+  --dota-blue: #5a7a9a;
+  --dota-purple: #7a5a9a;
+  --dota-orange: #a86a2a;
+  --dota-cyan: #5a8a8a;
+  
+  /* Shadows - Subtle depth */
+  --dota-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --dota-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --dota-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --dota-bevel: 12px;
+  
+  /* Inputs */
+  --dota-input-bg: #fdfcfb;
+  --dota-input-border: #e8e6e3;
+  --dota-input-focus: #a68a2e;
+  --dota-hover-glow: rgba(166, 138, 46, 0.06);
+  --dota-overlay: rgba(250, 249, 247, 0.9);
+  
+  /* Transitions */
+  --dota-transition: all 0.2s ease;
+}
+
+/* Theme transition */
+* {
+  transition: var(--dota-transition);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+/* Layout */
+body {
+  background: var(--dota-bg);
+  color: var(--dota-text);
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  background-image: 
+    radial-gradient(ellipse at 50% 0%, rgba(216, 182, 88, 0.02) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255, 255, 255, 0.01) 40px, rgba(255, 255, 255, 0.01) 41px);
+}
+
+/* Header */
+.dota-header {
+  background: linear-gradient(180deg, rgba(34, 34, 52, 0.05) 0%, rgba(20, 20, 30, 0.02) 100%),
+               linear-gradient(90deg, rgba(216, 182, 88, 0.03) 0%, transparent 40%);
+  border-bottom: 1px solid var(--dota-border-subtle);
+  padding: 1.2rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.dota-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.dota-logo-icon {
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle at 30% 30%, var(--dota-gold-light), var(--dota-gold-dim));
+  border-radius: 50%;
+  border: 2px solid var(--dota-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.15);
+}
+
+.dota-logo-text {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--dota-gold);
+  text-shadow: 0 0 8px rgba(201, 168, 76, 0.2);
+  letter-spacing: 0.5px;
+}
+
+.dota-logo-sub {
+  font-size: 0.7rem;
+  color: var(--dota-text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* Navigation */
+.nav-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.nav-link {
+  color: var(--dota-text-muted);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  transition: var(--dota-transition);
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: var(--dota-text);
+  background: rgba(166, 138, 46, 0.04);
+  border-color: var(--dota-gold-dim);
+}
+
+.nav-link.active {
+  color: var(--dota-gold);
+  background: rgba(201, 168, 76, 0.1);
+  border-color: var(--dota-gold-dim);
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Hero cards */
+.hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.hero-card {
+  background: var(--dota-bg-card);
+  border: 1px solid var(--dota-border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: var(--dota-transition);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+}
+
+.hero-card:hover {
+  background: var(--dota-bg-card-hover);
+  border-color: var(--dota-gold-dim);
+  transform: translateY(-2px);
+  box-shadow: var(--dota-shadow-hover);
+}
+
+.hero-card-top {
+  height: 120px;
+  background: linear-gradient(180deg, rgba(34, 34, 52, 0.05) 0%, rgba(20, 20, 30, 0.02) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--dota-border-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-card-top::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(0deg, rgba(13, 13, 18, 0.05) 0%, transparent 100%);
+}
+
+.hero-portrait {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--dota-gold-dim);
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.1);
+  transition: var(--dota-transition);
+}
+
+.hero-card:hover .hero-portrait {
+  border-color: var(--dota-gold);
+  box-shadow: 0 0 16px rgba(201, 168, 76, 0.2);
+}
+
+.hero-card-body {
+  padding: 0.8rem;
+}
+
+.hero-card-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--dota-text);
+  margin-bottom: 0.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-card-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hero-card-games {
+  font-size: 0.75rem;
+  color: var(--dota-text-muted);
+}
+
+.hero-card-wr {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.hero-card-wr.win {
+  background: rgba(74, 140, 63, 0.1);
+  color: var(--dota-green);
+}
+
+.hero-card-wr.loss {
+  background: rgba(168, 60, 60, 0.1);
+  color: var(--dota-red);
+}
+
+.hero-card-wr.neutral {
+  background: rgba(112, 112, 128, 0.05);
+  color: var(--dota-text-muted);
+}
+
+/* Stats cards */
+.stats-row,
+.stats-grid {
+  gap: 0.9rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--dota-bg-card);
+  border: 1px solid var(--dota-border-subtle);
+  border-radius: 8px;
+  padding: 1.2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: var(--dota-transition);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--dota-gold-light), transparent);
+}
+
+.stat-card .stat-label {
+  font-size: 0.7rem;
+  color: var(--dota-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--dota-gold);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card .stat-sub {
+  font-size: 0.75rem;
+  color: var(--dota-text-muted);
+}
+
+.stat-card.win-card::before {
+  background: linear-gradient(90deg, transparent, var(--dota-green), transparent);
+}
+
+.stat-card.win-card .stat-value {
+  color: var(--dota-green);
+}
+
+.stat-card.loss-card::before {
+  background: linear-gradient(90deg, transparent, var(--dota-red), transparent);
+}
+
+.stat-card.loss-card .stat-value {
+  color: var(--dota-red);
+}
+
+.stat-card.kda-card::before {
+  background: linear-gradient(90deg, transparent, var(--dota-cyan), transparent);
+}
+
+.stat-card.kda-card .stat-value {
+  color: var(--dota-cyan);
+}
+
+/* Sections */
+.dota-section {
+  background: var(--dota-bg-card);
+  border: 1px solid var(--dota-border-subtle);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dota-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--dota-gold);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--dota-border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dota-section-title .icon {
+  font-size: 1.1rem;
+}
+
+/* Match previews */
+.match-preview {
+  padding-left: 1.1rem;
+  border-left: 3px solid var(--dota-border-subtle);
+  border-radius: 0;
+  transition: var(--dota-transition);
+}
+
+.match-preview:hover {
+  border-left-color: var(--dota-gold);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.match-preview-portrait {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--dota-border-subtle);
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+/* Tables */
+.dota-table,
+.factor-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.dota-table th,
+.factor-table th {
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  color: var(--dota-text-muted);
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid var(--dota-border-subtle);
+}
+
+.dota-table td,
+.factor-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--dota-border-subtle);
+  vertical-align: middle;
+}
+
+.dota-table tr:hover td,
+.factor-table tr:hover td {
+  background: rgba(201, 168, 76, 0.03);
+}
+
+.dota-table .num {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
+
+.dota-table .center {
+  text-align: center;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--dota-border-subtle);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--dota-transition);
+  background: var(--dota-bg-surface);
+  color: var(--dota-text);
+}
+
+.btn:hover {
+  border-color: var(--dota-gold-dim);
+  color: var(--dota-gold);
+  background: rgba(166, 138, 46, 0.04);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--dota-gold-light) 0%, var(--dota-gold-dim) 100%);
+  color: #0d0d12;
+  border-color: var(--dota-gold);
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(166, 138, 46, 0.12);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 0 14px rgba(166, 138, 46, 0.16);
+}
+
+/* Footer */
+.dota-footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--dota-text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.3px;
+  border-top: 1px solid var(--dota-border-subtle);
+  margin-top: 2rem;
+}
+
+.dota-footer a {
+  color: var(--dota-gold);
+  text-decoration: none;
+}
+
+.dota-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Tip boxes */
+.tip-box {
+  background: rgba(201, 168, 76, 0.05);
+  border-left: 3px solid var(--dota-gold-dim);
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.85rem;
+  color: var(--dota-text);
+  line-height: 1.6;
+}
+
+.tip-box strong {
+  color: var(--dota-gold);
+}
+
+/* Empty states */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--dota-text-muted);
+}
+
+.empty-state .icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+
+.empty-state p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Code blocks */
+.code-block {
+  background: var(--dota-bg-surface);
+  border: 1px solid var(--dota-border-subtle);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--dota-text);
+  line-height: 1.6;
+}
+
+.code-block .cmd {
+  color: var(--dota-gold);
+}
+
+/* Endpoints */
+.endpoint {
+  background: var(--dota-bg-surface);
+  border-left: 3px solid var(--dota-cyan);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0 6px 6px 0;
+}
+
+.endpoint-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.method-badge {
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.method-get {
+  background: rgba(74, 140, 63, 0.1);
+  color: var(--dota-green);
+}
+
+.method-post {
+  background: rgba(168, 60, 60, 0.1);
+  color: var(--dota-red);
+}
+
+.endpoint-path {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--dota-text);
+}
+
+.endpoint-desc {
+  color: var(--dota-text-muted);
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.pagination button {
+  padding: 0.4rem 0.8rem;
+  background: var(--dota-bg-surface);
+  border: 1px solid var(--dota-border-subtle);
+  border-radius: 6px;
+  color: var(--dota-text);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: var(--dota-transition);
+}
+
+.pagination button:hover {
+  border-color: var(--dota-gold-dim);
+  color: var(--dota-gold);
+  background: rgba(201, 168, 76, 0.05);
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination button.active {
+  background: rgba(201, 168, 76, 0.1);
+  border-color: var(--dota-gold-dim);
+  color: var(--dota-gold);
+}
+
+/* Hero large */
+.hero-large {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.hero-portrait-large {
+  width: 180px;
+  height: 180px;
+  border-radius: 12px;
+  border: 3px solid var(--dota-gold);
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 24px rgba(201, 168, 76, 0.2);
+}
+
+/* Page titles */
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--dota-text);
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-title::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 4px;
+  height: 1.5em;
+  border-radius: 1px;
+  background: linear-gradient(180deg, var(--dota-gold-light), rgba(201, 168, 76, 0));
+}
+
+.page-subtitle {
+  color: var(--dota-text-muted);
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+}
+
+/* Back button */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--dota-text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  transition: var(--dota-transition);
+}
+
+.back-btn:hover {
+  color: var(--dota-gold);
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+
+/* Utility classes */
+.muted {
+  color: var(--dota-text-muted);
+}
+
+.gold {
+  color: var(--dota-gold);
+}
+
+.cyan {
+  color: var(--dota-cyan);
+}
+
+.fs-xs {
+  font-size: 0.7rem;
+}
+
+.fs-sm {
+  font-size: 0.8rem;
+}
+
+.mono {
+  font-family: 'Courier New', monospace;
+}
+
+.tc {
+  text-align: center;
+}
+
+.tl {
+  text-align: left;
+}
+
+.mt-sm {
+  margin-top: 0.5rem;
+}
+
+.mt-md {
+  margin-top: 1rem;
+}
+
+.hidden {
+  display: none;
+}
+
+.note-box {
+  color: var(--dota-text-muted);
+  font-size: 0.8rem;
+  padding: 1rem;
+  background: var(--dota-bg-surface);
+  border-radius: 6px;
+  border: 1px solid var(--dota-border-subtle);
+}
+
+.inline-code,
+code {
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  color: var(--dota-gold);
+  font-family: 'Courier New', monospace;
+  font-size: 0.85em;
+}
+
+/* Match hero header */
+.match-hero-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--dota-border-subtle);
+}
+
+.match-hero-portrait {
+  width: 128px;
+  height: 128px;
+  border-radius: 12px;
+  border: 3px solid var(--dota-gold);
+  box-shadow: 0 0 24px rgba(201, 168, 76, 0.2), 0 4px 16px rgba(0, 0, 0, 0.2);
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+
+.match-hero-info .page-title {
+  font-size: 1.5rem;
+  margin: 0 0 0.3rem 0;
+}
+
+.match-hero-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--dota-text);
+  margin-bottom: 0.6rem;
+}
+
+.match-result-banner {
+  display: inline-block;
+  padding: 0.45rem 1.4rem;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.result-win-banner {
+  background: linear-gradient(135deg, rgba(74, 140, 63, 0.1) 0%, rgba(74, 140, 63, 0.05) 100%);
+  border: 2px solid var(--dota-green);
+  color: var(--dota-green);
+  box-shadow: 0 0 16px rgba(74, 140, 63, 0.15);
+}
+
+.result-loss-banner {
+  background: linear-gradient(135deg, rgba(168, 60, 60, 0.1) 0%, rgba(168, 60, 60, 0.05) 100%);
+  border: 2px solid var(--dota-red);
+  color: var(--dota-red);
+  box-shadow: 0 0 16px rgba(168, 60, 60, 0.15);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--dota-border-subtle);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(250, 249, 247, 0.9), rgba(250, 249, 247, 0.7));
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+
+.theme-toggle:hover {
+    border-color: var(--dota-gold-dim);
+    background: linear-gradient(180deg, rgba(201, 168, 76, 0.1), rgba(250, 249, 247, 0.8));
+    box-shadow: 0 0 12px rgba(201, 168, 76, 0.2);
+    transform: scale(1.05);
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--dota-gold);
+    outline-offset: 2px;
+}
+.theme-toggle .theme-icon-sun,
+.theme-toggle .theme-icon-moon {
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+[data-theme="dark"] .theme-toggle .theme-icon-sun {
+    display: inline;
+}
+[data-theme="dark"] .theme-toggle .theme-icon-moon {
+    display: none;
+}
+[data-theme="light"] .theme-toggle .theme-icon-sun {
+    display: none;
+}
+[data-theme="light"] .theme-toggle .theme-icon-moon {
+    display: inline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .dota-header {
+    padding: 0.85rem 1rem;
+    gap: 0.8rem;
+  }
+  
+  .nav-bar {
+    width: 100%;
+    margin-left: 0;
+    overflow-x: auto;
+    padding-bottom: 0.2rem;
+  }
+  
+  .container {
+    padding: 1.25rem 1rem 0;
+  }
+  
+  .page-title {
+    font-size: 1.6rem;
+  }
+  
+  .dota-logo-text {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .nav-link {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.78rem;
+  }
+  
+  .stat-card .stat-value {
+    font-size: 1.6rem;
+  }
+  
+  .dota-section {
+    padding: 1.1rem 1rem;
+  }
+  
+  .dota-table,
+  .factor-table {
+    font-size: 0.75rem;
+  }
+  
+  .page-title {
+    font-size: 1.4rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  .dota-section,
+  .stat-card,
+  .hero-card,
+  .match-preview,
+  .code-block {
+    box-shadow: none !important;
+    filter: none !important;
+  }
+  
+  .dota-table,
+  .factor-table {
+    page-break-inside: auto;
+  }
+  
+  .dota-table tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+}
+
+
+/* =========================================================================
+   LIGHT THEME LAYOUT FIXES
+   Properties missing from light CSS that exist in dark CSS for the same
+   selectors — ensures identical layout structure across themes.
+   ========================================================================= */
+
+.back-btn {
+    padding: 0.35rem 0.9rem;
+    border: 1px solid var(--dota-border);
+}
+
+.hero-large {
+    border: 1px solid var(--dota-border);
+}
+
+.code-block {
+    border: 1px solid var(--dota-border);
+}
+
+.endpoint {
+    border: 1px solid var(--dota-border);
+}
+
+.draft-vs {
+    width: 100%;
+}
+
+/* =========================================================================
+   LIGHT THEME LAYOUT FIXES (missing properties)
+   ========================================================================= */
+
+/* Beveled corners (Dota 2 style) — same clip-path as dark theme */
+.dota-logo-icon {
+    position: relative;
+    clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+}
+
+.hero-card,
+.stat-card,
+.dota-section,
+.match-preview,
+.code-block,
+.endpoint {
+    position: relative;
+    clip-path: polygon(
+        var(--dota-bevel) 0,
+        100% 0,
+        100% calc(100% - var(--dota-bevel)),
+        calc(100% - var(--dota-bevel)) 100%,
+        0 100%,
+        0 var(--dota-bevel)
+    );
+}
+
+/* Header enhancements */
+.dota-header {
+    flex-wrap: wrap;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
+}
+
+.dota-header::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--dota-gold) 25%, var(--dota-gold) 75%, transparent);
+    opacity: 0.55;
+}
+
+.nav-bar {
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.nav-link {
+    position: relative;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.22rem;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--dota-gold), transparent);
+    transform: scaleX(0);
+    transition: transform 0.22s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    transform: scaleX(1);
+}
+
+.nav-link.active {
+  color: var(--dota-gold);
+  background: linear-gradient(180deg, rgba(166, 138, 46, 0.08), rgba(166, 138, 46, 0.02));
+  border-color: var(--dota-gold-dim);
+  box-shadow: inset 0 0 12px rgba(166, 138, 46, 0.06);
+}
+
+/* Stats row — critical: grid layout for stat cards */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+/* Stat card visual enhancements */
+.stat-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.stat-card::before {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--dota-gold-light), transparent);
+}
+
+.stat-card.win-card::before {
+    background: linear-gradient(90deg, transparent, var(--dota-green), transparent);
+}
+
+.stat-card.loss-card::before {
+    background: linear-gradient(90deg, transparent, var(--dota-red), transparent);
+}
+
+.stat-card.kda-card::before {
+    background: linear-gradient(90deg, transparent, var(--dota-cyan), transparent);
+}
+
+.stat-card .stat-value {
+    text-shadow: 0 0 16px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card .stat-label {
+    letter-spacing: 1.3px;
+}
+
+/* Section title enhancement */
+.dota-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(184, 150, 46, 0.35), transparent);
+}
+
+/* Match preview — full layout */
+.match-preview {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid var(--dota-border);
+    border-radius: 0;
+    background: var(--dota-bg);
+    transition: all 0.2s;
+}
+
+.match-preview:hover {
+  border-left-color: var(--dota-gold);
+  background: rgba(166, 138, 46, 0.03);
+}
+
+.match-preview-portrait {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    border: 2px solid var(--dota-border-subtle);
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.match-preview-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.match-preview-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.2rem;
+}
+
+.match-preview-hero {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dota-text);
+}
+
+.match-preview-result {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+}
+
+.match-preview-result.win {
+    background: rgba(61, 122, 46, 0.12);
+    color: var(--dota-green);
+}
+
+.match-preview-result.loss {
+    background: rgba(156, 42, 42, 0.12);
+    color: var(--dota-red);
+}
+
+.match-preview-kda {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: var(--dota-gold-dim);
+}
+
+.match-preview-meta {
+    font-size: 0.7rem;
+    color: var(--dota-text-muted);
+    margin-top: 0.1rem;
+}
+
+.match-preview-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.match-row-clickable {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.match-row-clickable:hover {
+  background: rgba(166, 138, 46, 0.05) !important;
+}
+
+.match-row-clickable:focus-visible {
+    outline: 2px solid var(--dota-gold-dim);
+    outline-offset: -2px;
+}
+
+/* Table enhancements */
+.dota-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.dota-table .hero-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dota-table .hero-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dota-table .hero-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid var(--dota-gold-dim);
+    object-fit: cover;
+    background: var(--dota-bg-card);
+}
+
+.dota-table .result-win {
+    color: var(--dota-green);
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.dota-table .result-loss {
+    color: var(--dota-red);
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+/* Factor table enhancements */
+.factor-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.factor-pos {
+    color: var(--dota-green);
+    font-weight: 600;
+}
+
+.factor-neg {
+    color: var(--dota-red);
+    font-weight: 600;
+}
+
+.factor-neu {
+    color: var(--dota-text-muted);
+}
+
+/* Advice list */
+.advice-list {
+    list-style: none;
+    padding: 0;
+}
+
+.advice-list li {
+    padding: 0.7rem 0.9rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    background: var(--dota-bg);
+    border-left: 3px solid var(--dota-gold);
+}
+
+.advice-list li.advice-win {
+    border-left-color: var(--dota-green);
+}
+
+.advice-list li.advice-loss {
+    border-left-color: var(--dota-red);
+}
+
+/* Hero info (hero detail page) */
+.hero-info {
+    flex: 1;
+}
+
+.hero-info h1 {
+    font-size: 1.8rem;
+    color: var(--dota-gold);
+    margin-bottom: 0.5rem;
+}
+
+.hero-info .hero-meta {
+    color: var(--dota-text-muted);
+    font-size: 0.85rem;
+}
+
+.hero-large {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.hero-portrait-large {
+  width: 180px;
+  height: 180px;
+  border-radius: 12px;
+  border: 3px solid var(--dota-gold);
+  object-fit: cover;
+  background: var(--dota-bg-card);
+  box-shadow: 0 0 20px rgba(166, 138, 46, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.match-hero-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--dota-border);
+    flex-wrap: wrap;
+}
+
+.match-hero-portrait {
+  width: 128px;
+  height: 128px;
+  border-radius: 12px;
+  border: 3px solid var(--dota-gold);
+  box-shadow: 0 0 20px rgba(166, 138, 46, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
+}
+
+.match-hero-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.match-hero-info .page-title {
+    font-size: 1.5rem;
+    margin: 0 0 0.3rem 0;
+}
+
+.match-hero-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--dota-text);
+    margin-bottom: 0.6rem;
+}
+
+.match-result-banner {
+    display: inline-block;
+    padding: 0.45rem 1.4rem;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.result-win-banner {
+    background: linear-gradient(135deg, rgba(61, 122, 46, 0.1) 0%, rgba(61, 122, 46, 0.05) 100%);
+    border: 2px solid var(--dota-green);
+    color: var(--dota-green);
+    box-shadow: 0 0 16px rgba(61, 122, 46, 0.15);
+}
+
+.result-loss-banner {
+    background: linear-gradient(135deg, rgba(156, 42, 42, 0.1) 0%, rgba(156, 42, 42, 0.05) 100%);
+    border: 2px solid var(--dota-red);
+    color: var(--dota-red);
+    box-shadow: 0 0 16px rgba(156, 42, 42, 0.15);
+}
+
+.result-icon {
+    margin-right: 0.4rem;
+}
+
+.match-id-link {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(166, 138, 46, 0.3);
+    transition: border-color 0.2s;
+}
+
+.match-id-link:hover {
+    border-bottom-color: var(--dota-gold);
+}
+
+/* Match draft */
+.match-draft {
+    background: linear-gradient(180deg, rgba(250, 249, 247, 0.3), rgba(250, 249, 247, 0.6));
+    border: 1px solid var(--dota-border);
+    border-left: 3px solid var(--dota-gold-dim);
+    border-radius: var(--dota-bevel);
+    box-shadow: var(--dota-shadow);
+    margin: 1rem 0;
+    overflow: hidden;
+    position: relative;
+    clip-path: polygon(
+        var(--dota-bevel) 0,
+        100% 0,
+        100% calc(100% - var(--dota-bevel)),
+        calc(100% - var(--dota-bevel)) 100%,
+        0 100%,
+        0 var(--dota-bevel)
+    );
+}
+
+.draft-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid var(--dota-border);
+}
+
+.draft-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.draft-label.radiant {
+    background: linear-gradient(180deg, rgba(61, 122, 46, 0.12) 0%, rgba(61, 122, 46, 0.02) 100%);
+    border: 1px solid rgba(61, 122, 46, 0.3);
+    color: var(--dota-green);
+}
+
+.draft-label.dire {
+    background: linear-gradient(180deg, rgba(156, 42, 42, 0.12) 0%, rgba(156, 42, 42, 0.02) 100%);
+    border: 1px solid rgba(156, 42, 42, 0.3);
+    color: var(--dota-red);
+}
+
+.draft-vs {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--dota-text-muted);
+    flex-shrink: 0;
+}
+.draft-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 4px 16px 16px;
+}
+.final-score .team-score {
+    font-size: 2.4rem;
+}
+.team-score {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+}
+.team-score.radiant {
+    color: var(--dota-green);
+}
+.team-score.dire {
+    color: var(--dota-red);
+}
+.team-score.radiant.won {
+    color: var(--dota-green);
+    text-shadow: 0 0 14px rgba(90, 138, 74, 0.35);
+}
+.team-score.dire.won {
+    color: var(--dota-red);
+    text-shadow: 0 0 14px rgba(146, 74, 74, 0.35);
+}
+.score-vs {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dota-text-muted);
+}
+
+.draft-teams {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
+
+.draft-team {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    min-height: 120px;
+}
+
+.draft-team.radiant {
+    background: linear-gradient(180deg, rgba(61, 122, 46, 0.05) 0%, rgba(61, 122, 46, 0.01) 100%);
+    border-right: 1px solid var(--dota-border);
+}
+
+.draft-team.dire {
+    background: linear-gradient(180deg, rgba(156, 42, 42, 0.05) 0%, rgba(156, 42, 42, 0.01) 100%);
+}
+
+.draft-heroes {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    min-height: 100px;
+}
+
+.draft-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    width: 72px;
+    flex-shrink: 0;
+}
+
+.draft-hero.yours .draft-hero-img {
+  border-color: var(--dota-gold);
+  box-shadow: 0 0 8px rgba(166, 138, 46, 0.3);
+}
+
+.you-badge {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: var(--dota-gold);
+    color: #000;
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 1px 3px;
+    border-radius: 2px;
+    line-height: 1;
+}
+
+.draft-hero-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 4px;
+    border: 1px solid var(--dota-border-subtle);
+    object-fit: cover;
+    background: rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.draft-hero-img:hover {
+    border-color: var(--dota-gold);
+    transform: scale(1.05);
+    z-index: 1;
+    transition: transform 0.2s;
+}
+
+.hero-position {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    border: 2px solid #1a1a2e;
+    z-index: 10;
+    line-height: 1;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.hero-position.pos-1 { background: linear-gradient(135deg, #e86c00 0%, #c85800 100%); }
+.hero-position.pos-2 { background: linear-gradient(135deg, #b84ec9 0%, #963db8 100%); }
+.hero-position.pos-3 { background: linear-gradient(135deg, #00a8e8 0%, #008cc8 100%); }
+.hero-position.pos-4 { background: linear-gradient(135deg, #6adf5a 0%, #4ac84a 100%); }
+.hero-position.pos-5 { background: linear-gradient(135deg, #ffd700 0%, #e6c200 100%); }
+
+.draft-hero-items {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 72px;
+    max-width: 72px;
+}
+
+.draft-item-img {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid var(--dota-border-subtle);
+    object-fit: cover;
+    background: rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+}
+
+.draft-item-img:hover {
+    transform: scale(1.6);
+    border-color: var(--dota-gold);
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.draft-item-img[title*="Neutral"] {
+    border-color: #8b6f47;
+}
+
+.draft-item-img[title*="neutral"] {
+    border-color: #8b6f47;
+}
+
+.draft-column {
+    width: 100%;
+}
+
+.match-draft-mini {
+    grid-template-columns: 1fr;
+    width: 100%;
+}
+
+/* Items and skills */
+.skill-build,
+.item-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.item-badge {
+    background: rgba(166, 138, 46, 0.06);
+    border: 1px solid rgba(166, 138, 46, 0.18);
+    border-radius: 4px;
+    padding: 3px;
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.15s;
+}
+
+.item-badge:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+.item-badge img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.15s;
+}
+
+.item-badge:hover img {
+    transform: scale(1.6);
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.skill-badge {
+    background: rgba(166, 138, 46, 0.06);
+    border: 1px solid rgba(166, 138, 46, 0.18);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.15s;
+}
+
+.skill-badge:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+.skill-badge img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.15s;
+}
+
+.skill-badge:hover img {
+    transform: scale(1.6);
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* MVP card */
+.mvp-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(184, 150, 46, 0.08);
+    border: 1px solid rgba(184, 150, 46, 0.3);
+    border-radius: 6px;
+    padding: 12px 16px;
+}
+
+.mvp-card img {
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.mvp-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--dota-gold);
+}
+
+.mvp-hero {
+    font-size: 0.9rem;
+    color: var(--dota-text-muted);
+}
+
+.mvp-stats {
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+/* Error pills (errors page) — bright red text on light red background */
+.error-pill {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  background: rgba(156, 42, 42, 0.12);
+  color: #7a1f1f;
+  border: 1px solid rgba(156, 42, 42, 0.35);
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0.1rem;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+/* Error cards (report page) */
+.error-card {
+  background: rgba(156, 42, 42, 0.06);
+  border-left: 4px solid var(--dota-red);
+  border-radius: 4px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+}
+
+.error-card-title {
+  font-weight: 700;
+  color: #7a1f1f;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.error-stat {
+  font-size: 0.9rem;
+  margin: 4px 0;
+  color: #5a3a3a;
+}
+
+.error-fix {
+  font-size: 0.85rem;
+  color: #7a1f1f;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.report-text {
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 6px;
+    padding: 16px;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
+.tip-box.ok {
+    border-left: 4px solid var(--dota-green);
+    background: rgba(61, 122, 46, 0.05);
+}
+
+.tip-box.warn {
+    border-left: 4px solid var(--dota-gold-dim);
+    background: rgba(184, 150, 46, 0.03);
+}
+
+.tip-box.bad {
+    border-left: 4px solid var(--dota-red);
+    background: rgba(156, 42, 42, 0.05);
+}
+
+/* Hero thumb small */
+.hero-thumb-sm {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* Stat value sizes */
+.stat-value-sm,
+.stat-card .stat-value.stat-value-sm {
+    font-size: 1rem;
+}
+
+.stat-value-xs,
+.stat-card .stat-value.stat-value-xs {
+    font-size: 0.9rem;
+}
+
+/* Empty state small */
+.empty-state-sm {
+    padding: 2rem;
+}
+
+/* Selection and focus */
+::selection {
+    background: rgba(184, 150, 46, 0.15);
+    color: #000;
+}
+
+:focus-visible {
+    outline: 2px solid var(--dota-gold-dim);
+    outline-offset: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dota-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--dota-border-light), var(--dota-bg-card));
+    border: 1px solid var(--dota-border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--dota-gold-dim);
+}
+
+/* Logo */
+a.dota-logo {
+    color: inherit;
+    text-decoration: none;
+}
+
+a.dota-logo:hover .dota-logo-text {
+    text-shadow: 0 0 16px rgba(166, 138, 46, 0.35);
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+    .dota-header {
+        padding: 0.85rem 1rem;
+        gap: 0.8rem;
+    }
+    .stats-row {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+    .stat-card .stat-value {
+        font-size: 1.6rem;
+    }
+    .dota-section {
+        padding: 1.1rem 1rem;
+    }
+    .dota-table,
+    .factor-table {
+        font-size: 0.75rem;
+    }
+    .page-title {
+        font-size: 1.15rem;
+    }
+    .match-hero-header {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+    .match-hero-portrait {
+        width: 96px;
+        height: 96px;
+    }
+    .match-hero-info {
+        min-width: calc(100% - 112px);
+    }
+    .match-draft-mini {
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+    .draft-vs {
+        display: none;
+    }
+    .draft-column {
+        width: 100%;
+    }
+}
+
+@media (max-width: 620px) {
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+    .stat-card .stat-value {
+        font-size: 1.4rem;
+    }
+    .page-title {
+        font-size: 1.15rem;
+    }
+    .dota-section {
+        padding: 0.9rem;
+    }
+    .hero-portrait-large {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+/* Print */
+@media print {
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+    .dota-section,
+    .stat-card,
+    .hero-card,
+    .match-preview,
+    .code-block {
+        box-shadow: none !important;
+        filter: none !important;
+    }
+    .dota-table,
+    .factor-table {
+        page-break-inside: auto;
+    }
+    .dota-table tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+}

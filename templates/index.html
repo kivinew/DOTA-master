@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}DOTA_MASTER — Статистика игр{% endblock %}
+
+{% block content %}
+<h1 class="page-title">📊 Дашборд</h1>
+<p class="page-subtitle">Общая статистика игр в DOTA 2 из OpenDota</p>
+<!-- Статистика -->
+{% if stats and stats.total_games > 0 %}
+<div class="stats-row">
+    <div class="stat-card win-card">
+        <div class="stat-label">Побед</div>
+        <div class="stat-value">{{ stats.total_wins }}</div>
+        <div class="stat-sub">{{ stats.win_rate }}% Win Rate</div>
+    </div>
+    <div class="stat-card loss-card">
+        <div class="stat-label">Поражений</div>
+        <div class="stat-value">{{ stats.total_losses }}</div>
+        <div class="stat-sub">{{ (100-stats.win_rate)|round(1) }}% Loss Rate</div>
+    </div>
+    <div class="stat-card kda-card">
+        <div class="stat-label">Средний KDA</div>
+        <div class="stat-value">{{ "%.1f"|format(stats.avg_kd) }}</div>
+        <div class="stat-sub">K+A / D</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Всего игр</div>
+        <div class="stat-value">{{ stats.total_games }}</div>
+        <div class="stat-sub">в базе</div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Герой-сетка -->
+{% if top_heroes and top_heroes|length > 0 %}
+<div class="dota-section">
+    <div class="dota-section-title"><span class="icon">👥</span> Герои (топ по играм)</div>
+    <div class="hero-grid">
+        {% for h in top_heroes %}
+        {% set slug = hero_slug(h.hero) %}
+        <a href="/hero/{{ h.hero }}" class="hero-card">
+            <div class="hero-card-top">
+                <img class="hero-portrait"
+                     src="{{ hero_img_url(h.hero) }}"
+                     alt="{{ h.hero }}"
+                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>👾</text></svg>'">
+            </div>
+            <div class="hero-card-body">
+                <div class="hero-card-name">{{ h.hero }}</div>
+                <div class="hero-card-stats">
+                    <span class="hero-card-games">{{ h.games }} игр</span>
+                    <span class="hero-card-wr {% if h.win_rate >= 55 %}win{% elif h.win_rate >= 45 %}neutral{% else %}loss{% endif %}">
+                        {{ "%.1f"|format(h.win_rate) }}% WR
+                    </span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Свежие матчи -->
+{% if fresh_matches and fresh_matches|length > 0 %}
+<div class="dota-section">
+    <div class="dota-section-title"><span class="icon">🔄</span> Свежие матчи (последние 20)</div>
+    {% for m in fresh_matches[:10] %}
+    {% set mslug = hero_slug(m.hero) %}
+    <a href="/match/{{ m.match_id }}" class="match-preview-link">
+    <div class="match-preview">
+        <img class="match-preview-portrait"
+             src="{{ hero_img_url(m.hero) }}"
+             alt="{{ m.hero }}"
+             onerror="this.style.display='none'">
+        <div class="match-preview-info">
+            <div class="match-preview-header">
+                <span class="match-preview-hero">{{ m.hero }}</span>
+                <span class="match-preview-result {% if m.result == 'win' %}win{% else %}loss{% endif %}">
+                    {{ m.result.upper() }}
+                </span>
+            </div>
+            <div class="match-preview-kda">
+                {{ m.K }} / {{ m.D }} / {{ m.A }}
+            </div>
+            <div class="match-preview-meta">
+                {{ m.duration }} · {{ m.side }} · {{ game_mode_name(m.game_mode) }}
+            </div>
+        </div>
+    </div>
+    </a>
+    {% endfor %}
+    {% if fresh_matches|length > 10 %}
+    <div class="tc mt-sm">
+        <a href="/fresh" class="btn btn-primary">Все {{ fresh_matches|length }} матчей →</a>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Краткий анализ -->
+{% if stats and stats.total_games > 0 %}
+<div class="dota-section">
+    <div class="dota-section-title"><span class="icon">📈</span> Краткий анализ</div>
+    {% set wr = stats.win_rate %}
+    {% set top_hero = stats.by_hero[0] if stats.by_hero else None %}
+    <div class="tip-box">
+        <strong>Win Rate:</strong> {{ "%.1f"|format(wr) }}% ({{ stats.total_wins }}W / {{ stats.total_losses }}L)<br>
+        {% if top_hero and top_hero.games >= 3 %}
+        <strong>Основной герой:</strong> {{ top_hero.hero }} — {{ top_hero.games }} игр, WR {{ "%.1f"|format(top_hero.win_rate) }}%<br>
+        {% endif %}
+        <strong>Средний KDA:</strong> {{ "%.1f"|format(stats.avg_kd) }}<br>
+        {% if stats.avg_gpm > 0 %}
+        <strong>Средний GPM:</strong> {{ "%.1f"|format(stats.avg_gpm) }} | <strong>XPM:</strong> {{ "%.1f"|format(stats.avg_xpm) }}<br>
+        {% endif %}
+    </div>
+    <p class="muted fs-sm mt-sm">
+        * Данные из OpenDota API. GPM/XPM/last_hits могут отсутствовать.
+    </p>
+</div>
+{% else %}
+<div class="dota-section">
+    <div class="empty-state">
+        <div class="icon">📊</div>
+        <p>Статистики пока нет. Автообновление подтянет игры с OpenDota само, пока сервер запущен.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

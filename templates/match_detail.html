@@ -1,0 +1,400 @@
+<!-- UNIQUE_MARKER_2026 -->
+{% extends "base.html" %}
+
+{% block title %}DOTA_MASTER — Матч {{ match.match_id }}{% endblock %}
+
+{% block content %}
+<a href="/macro" class="back-btn">← Анализ</a>
+<div class="match-hero-header">
+    <img src="{{ hero_img_url(match.hero_name, 192) }}" alt="{{ match.hero_name }}" class="match-hero-portrait">
+    <div class="match-hero-info">
+        <h1 class="page-title">🎮 <a href="https://www.opendota.com/matches/{{ match.match_id }}" target="_blank" rel="noopener noreferrer" class="match-id-link">Матч {{ match.match_id }} ↗</a></h1>
+        <div class="match-hero-name">{{ match.hero_name }}</div>
+        <div class="match-result-banner {% if match.result == 'win' %}result-win-banner{% else %}result-loss-banner{% endif %}">
+            {% if match.result == 'win' %}
+                <span class="result-icon">🏆</span> Победа
+            {% else %}
+                <span class="result-icon">💀</span> Поражение
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Итоговый счет -->
+<div class="dota-section" style="margin-top: 10px;">
+    <div class="dota-section-title">Счет</div>
+    <div class="draft-score final-score">
+        <span class="team-score radiant{% if match.radiant_win %} won{% endif %}">{{ match.radiant_score | default(0, true) }}</span>
+        <span class="score-vs">:</span>
+        <span class="team-score dire{% if not match.radiant_win %} won{% endif %}">{{ match.dire_score | default(0, true) }}</span>
+    </div>
+</div>
+
+<!-- Проблемы/Рекомендации -->
+{% if match.tips %}
+<div class="dota-section">
+    <div class="dota-section-title">💡 Рекомендации</div>
+    <div class="tip-box">
+        <ul>
+        {% for tip in match.tips %}
+            <li>{{ tip }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+{% if picks_bans %}
+<div class="match-draft">
+    <div class="draft-header">
+        <span class="draft-label radiant">
+            {% if match.radiant_win %}🏆{% else %}💀{% endif %} RADIANT
+        </span>
+        <span class="draft-vs">VS</span>
+        <span class="draft-label dire">
+            {% if not match.radiant_win %}🏆{% else %}💀{% endif %} DIRE
+        </span>
+        {% set mvp = match.mvp_radiant or match.mvp_dire %}
+        {% set mvp_team = "Radiant" if match.mvp_radiant else ("Dire" if match.mvp_dire else "—") %}
+    </div>
+
+    <div class="draft-score">
+        <span class="team-score radiant{% if match.radiant_win %} won{% endif %}">{{ match.radiant_score | default(0, true) }}</span>
+        <span class="score-vs">:</span>
+        <span class="team-score dire{% if not match.radiant_win %} won{% endif %}">{{ match.dire_score | default(0, true) }}</span>
+    </div>
+
+    <div class="draft-teams">
+        <div class="draft-team radiant">
+            <div class="draft-heroes">
+                {% for p in picks_bans %}
+                    {% if p.team == 0 and p.is_pick %}
+                        {% if match.hero_id == p.hero_id %}<div class="draft-hero yours">{% else %}<div class="draft-hero">{% endif %}
+                            {% if p.position %}
+                            <span class="hero-position pos-{{ p.position }}">{{ p.position }}</span>
+                            {% endif %}
+                            <img src="{{ hero_img_url(p.hero_name) }}" class="draft-hero-img" title="{{ p.hero_name }}">
+                                                        <span class="hero-kda">({{ p.kills }}-{{ p.deaths }}-{{ p.assists }})</span>
+                                                        {% if match.hero_id == p.hero_id %}<span class="you-badge">Ты</span>{% endif %}
+                            {% if p.hero_items %}
+                            <div class="draft-hero-items">
+                                {% for item in p.hero_items %}
+                                    {% if item is mapping %}
+                                        {% set item_id = item.id %}
+                                        {% set item_title = item.name or hero_item_name(item) %}
+                                    {% elif item is sequence %}
+                                        {% set item_id = item[1] %}
+                                        {% set item_title = hero_item_name(item) %}
+                                    {% else %}
+                                        {% set item_id = item %}
+                                        {% set item_title = hero_item_name(item) %}
+                                    {% endif %}
+                                    <img src="{{ item_img_url(item_id) }}" class="draft-item-img" title="{{ item_title }}">
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="draft-team dire">
+            <div class="draft-heroes">
+                {% for p in picks_bans %}
+                    {% if p.team == 1 and p.is_pick %}
+                        {% if match.hero_id == p.hero_id %}<div class="draft-hero yours">{% else %}<div class="draft-hero">{% endif %}
+                            {% if p.position %}
+                            <span class="hero-position pos-{{ p.position }}">{{ p.position }}</span>
+                            {% endif %}
+                            <img src="{{ hero_img_url(p.hero_name) }}" class="draft-hero-img" title="{{ p.hero_name }}">
+                                                        <span class="hero-kda">({{ p.kills }}-{{ p.deaths }}-{{ p.assists }})</span>
+                                                        {% if match.hero_id == p.hero_id %}<span class="you-badge">Ты</span>{% endif %}
+                            {% if p.hero_items %}
+                            <div class="draft-hero-items">
+                                {% for item in p.hero_items %}
+                                    {% if item is mapping %}
+                                        {% set item_id = item.id %}
+                                        {% set item_title = item.name or hero_item_name(item) %}
+                                    {% elif item is sequence %}
+                                        {% set item_id = item[1] %}
+                                        {% set item_title = hero_item_name(item) %}
+                                    {% else %}
+                                        {% set item_id = item %}
+                                        {% set item_title = hero_item_name(item) %}
+                                    {% endif %}
+                                    <img src="{{ item_img_url(item_id) }}" class="draft-item-img" title="{{ item_title }}">
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Контрптик: герои, контрирующие твоего героя (из вражеской команды) -->
+{% set counter_list = counter_list or get_counter_heroes(match.hero_name) %}
+{% set primary = primary or get_primary_counter(match.hero_name) %}
+{% if counter_list %}
+<div class="dota-section">
+    <div class="dota-section-title">🎯 Контрптик</div>
+    <p class="muted">Основные герои, контрирующие твоего героя (по материалам проекта и игры).</p>
+
+    <div class="stat-card">
+        <div class="stat-label">Твой герой</div>
+        <div class="stat-value">{{ match.hero_name }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Контрптик</div>
+        <div class="stat-value">{{ primary }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Почему</div>
+        <div class="stat-sub">{{ counter_note(match.hero_name) }}</div>
+    </div>
+
+    <p class="muted">Вражеские герои, контрирующие твоего героя:</p>
+    <div class="counter-heroes">
+    {% for h in counter_list %}
+        <div class="counter-hero">
+            <img src="{{ hero_img_url(h) }}" alt="{{ h }}">
+            <span>{{ h }}</span>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Билд скиллов -->
+{% if match.skill_build.build %}
+<div class="dota-section">
+    <div class="dota-section-title">⚡ Прокачка</div>
+    <div class="skill-build">
+        {% for skill in match.skill_build['build'] %}
+        <span class="skill-badge">
+            <img src="{{ ability_img_url(skill.id | int) }}" alt="{{ skill.name }}" title="{{ skill.name }}">
+        </span>
+        {% endfor %}
+    </div>
+    {% if match.skill_build.notes %}
+    <div class="tip-box mt-sm">
+        <ul>
+        {% for note in match.skill_build['notes'] %}
+            <li>{{ note }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Айтемы -->
+{% if match.item_build.items %}
+<div class="dota-section">
+    <div class="dota-section-title">🎒 Айтемы</div>
+    <div class="item-list">
+        {% for item in match.item_build['items'] %}
+        {% if item.id %}
+        <span class="item-badge">
+            <img src="{{ item_img_url(item.id | int) }}" alt="{{ item.name }}" title="{{ item.name }}">
+        </span>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% if match.item_build.notes %}
+    <div class="tip-box mt-sm">
+        <ul>
+        {% for note in match.item_build['notes'] %}
+            <li>{{ note }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+
+<div class="dota-section">
+    <div class="dota-section-title">📊 Статистика</div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">KDA</div>
+            <div class="stat-value">{{ match.kda }}</div>
+            <div class="stat-sub">{{ match.kills }} / {{ match.deaths }} / {{ match.assists }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">GPM</div>
+            <div class="stat-value">{{ match.gpm }}</div>
+            <div class="stat-sub">команда avg: {{ match.team_avg.gpm }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">XPM</div>
+            <div class="stat-value">{{ match.xpm }}</div>
+            <div class="stat-sub">команда avg: {{ match.team_avg.xpm }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">DPM</div>
+            <div class="stat-value">{{ match.dpm }}</div>
+            <div class="stat-sub">урон по героям</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">LH/мин</div>
+            <div class="stat-value">{{ match.lhpm }}</div>
+            <div class="stat-sub">ластхитов</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Башни</div>
+            <div class="stat-value">{{ match.tower_damage }}</div>
+            <div class="stat-sub">{{ match.tower_part }}% команды</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Убийства</div>
+            <div class="stat-value">{{ match.kill_part }}%</div>
+            <div class="stat-sub">вклад в команду</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Урон</div>
+            <div class="stat-value">{{ match.damage_part }}%</div>
+            <div class="stat-sub">вклад в команду</div>
+        </div>
+    </div>
+</div>
+
+<!-- Вклад в игру (проценты) -->
+<div class="dota-section">
+    <div class="dota-section-title">📈 Вклад в игру (%)</div>
+    <table class="dota-table">
+        <thead>
+            <tr>
+                <th>Показатель</th>
+                <th class="num">Ты</th>
+                <th class="num">MVP</th>
+                <th class="num">Разница</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if mvp %}
+            <tr><td>Игрок</td><td class="num">Ты</td><td class="num">{{ mvp.name }}</td><td>—</td></tr>
+            <tr><td>Герой</td><td class="num">{{ match.hero_name }}</td><td class="num">{{ mvp.hero_name }}</td><td>—</td></tr>
+            <tr>
+                <td>KDA</td>
+                <td class="num">{{ match.kda }}</td>
+                <td class="num">{{ mvp.kda }}</td>
+                <td class="num {% if match.kda >= mvp.kda %}result-win{% else %}result-loss{% endif %}">{{ (match.kda - mvp.kda) | round(2) }}</td>
+            </tr>
+            <tr>
+                <td>Убийства</td>
+                <td class="num">{{ match.kills }}</td>
+                <td class="num">{{ mvp.kills }}</td>
+                <td class="num {% if match.kills >= mvp.kills %}result-win{% else %}result-loss{% endif %}">{{ match.kills - mvp.kills }}</td>
+            </tr>
+            <tr>
+                <td>Смерти</td>
+                <td class="num">{{ match.deaths }}</td>
+                <td class="num">{{ mvp.deaths }}</td>
+                <td class="num {% if match.deaths <= mvp.deaths %}result-win{% else %}result-loss{% endif %}">{{ mvp.deaths - match.deaths }}</td>
+            </tr>
+            <tr>
+                <td>Помощи</td>
+                <td class="num">{{ match.assists }}</td>
+                <td class="num">{{ mvp.assists }}</td>
+                <td class="num {% if match.assists >= mvp.assists %}result-win{% else %}result-loss{% endif %}">{{ match.assists - mvp.assists }}</td>
+            </tr>
+            <tr>
+                <td>GPM</td>
+                <td class="num">{{ match.gpm }}</td>
+                <td class="num">{{ mvp.gpm }}</td>
+                <td class="num {% if match.gpm >= mvp.gpm %}result-win{% else %}result-loss{% endif %}">{{ match.gpm - mvp.gpm }}</td>
+            </tr>
+            <tr>
+                <td>XPM</td>
+                <td class="num">{{ match.xpm }}</td>
+                <td class="num">{{ mvp.xpm }}</td>
+                <td class="num {% if match.xpm >= mvp.xpm %}result-win{% else %}result-loss{% endif %}">{{ match.xpm - mvp.xpm }}</td>
+            </tr>
+            <tr>
+                <td>Вклад в убийства</td>
+                <td class="num">{{ match.kill_part }}%</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+            </tr>
+            <tr>
+                <td>Вклад в урон</td>
+                <td class="num">{{ match.damage_part }}%</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+            </tr>
+            <tr>
+                <td>Вклад в башни</td>
+                <td class="num">{{ match.tower_part }}%</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+            </tr>
+            <tr>
+                <td>Вклад в ластхиты</td>
+                <td class="num">{{ match.lh_part }}%</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+            </tr>
+            <tr>
+                <td>Вклад в GPM</td>
+                <td class="num">{{ match.gpm_part }}%</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+            </tr>
+            <tr>
+                <td>Вклад в XPM</td>
+                <td class="num">{{ match.xpm_part }}%</td>
+                <td class="num">—</td>
+                <td class="num">—</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4">MVP не удалось определить</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Сравнение с командой -->
+<div class="dota-section">
+    <div class="dota-section-title">🤝 Сравнение с командой</div>
+    <table class="dota-table">
+        <thead>
+            <tr>
+                <th>Показатель</th>
+                <th class="num">Ты</th>
+                <th class="num">Команда avg</th>
+                <th class="num">Разница</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>GPM</td>
+                <td class="num">{{ match.gpm }}</td>
+                <td class="num">{{ match.team_avg.gpm }}</td>
+                <td class="num {% if match.gpm < match.team_avg.gpm %}result-loss{% else %}result-win{% endif %}">{{ match.gpm - match.team_avg.gpm }}</td>
+            </tr>
+            <tr>
+                <td>XPM</td>
+                <td class="num">{{ match.xpm }}</td>
+                <td class="num">{{ match.team_avg.xpm }}</td>
+                <td class="num {% if match.xpm < match.team_avg.xpm %}result-loss{% else %}result-win{% endif %}">{{ match.xpm - match.team_avg.xpm }}</td>
+            </tr>
+            <tr>
+                <td>Смертей</td>
+                <td class="num">{{ match.deaths }}</td>
+                <td class="num">{{ match.team_avg.deaths }}</td>
+                <td class="num {% if match.deaths > match.team_avg.deaths %}result-loss{% else %}result-win{% endif %}">{{ match.deaths - match.team_avg.deaths }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+{% endblock %}

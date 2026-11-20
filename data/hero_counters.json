@@ -1,0 +1,936 @@
+{
+  "Alchemist": {
+    "note": "Разрушает аптечки и дистанцию каста; убивает медленные героев.",
+    "counters": [
+      "Ancient Apparition",
+      "Doom",
+      "Slardar",
+      "Ursa",
+      "Slark",
+      "Axe"
+    ]
+  },
+  "Anti-Mage": {
+    "note": "Обходит ману и фасты; неуязвим к линиям и стендам.",
+    "counters": [
+      "Meepo",
+      "Legion Commander",
+      "Axe",
+      "Bloodseeker",
+      "Troll Warlord",
+      "Nyx Assassin",
+      "Shadow Shaman"
+    ]
+  },
+  "Axe": {
+    "note": "Опасен в начале игры; дёшевый чистый урон и большая толщина.",
+    "counters": [
+      "Viper",
+      "Outworld Destroyer",
+      "Anti-Mage",
+      "Lifestealer",
+      "Timbersaw",
+      "Venomancer",
+      "Invoker"
+    ]
+  },
+  "Bane": {
+    "note": "Уязвим к глушке, стунам и блоку; без блокировки проигрывает.",
+    "counters": [
+      "Silencer",
+      "Lion",
+      "Anti-Mage",
+      "Vengeful Spirit"
+    ]
+  },
+  "Bristleback": {
+    "note": "Разрушается без маны; нужны щиты, пронизывающие удары и разъёмы.",
+    "counters": [
+      "Anti-Mage",
+      "Silencer",
+      "Lion",
+      "Outworld Destroyer"
+    ]
+  },
+  "Brewmaster": {
+    "note": "Опасен после ульты; нужно глушить до неё и убивать до полного набора.",
+    "counters": [
+      "Silencer",
+      "Luna",
+      "Sand King",
+      "Naga Siren"
+    ]
+  },
+  "Bounty Hunter": {
+    "note": "Не умеет в одиночные удары и возвращение; теряет время в лане.",
+    "counters": [
+      "Ancient Apparition",
+      "Slark"
+    ]
+  },
+  "Centaur Warrunner": {
+    "note": "Не умеет в ближний бой и закрытые линии.",
+    "counters": [
+      "Necrophos",
+      "Lifestealer",
+      "Timbersaw",
+      "Lina",
+      "Underlord",
+      "Dark Willow",
+      "Outworld Destroyer",
+      "Venomancer"
+    ]
+  },
+  "Chaos Knight": {
+    "note": "Опасен в тефтах и под аурами; нужны щиты, разъёмы и лед.",
+    "counters": [
+      "Earthshaker",
+      "Sven",
+      "Timbersaw",
+      "Naga Siren",
+      "Sand King",
+      "Warlock",
+      "Lich",
+      "Axe"
+    ]
+  },
+  "Chen": {
+    "note": "Не умеет в быстрый урон и медленные линии.",
+    "counters": [
+      "Axe",
+      "Earthshaker",
+      "Enigma",
+      "Leshrac",
+      "Sand King",
+      "Winter Wyvern",
+      "Batrider"
+    ]
+  },
+  "Clockwerk": {
+    "note": "Уязвим перед короткими анимациями и каналами; ставит на расстояние.",
+    "counters": [
+      "Necrophos",
+      "Doom",
+      "Underlord",
+      "Morphling",
+      "Ursa",
+      "Rubick",
+      "Skywrath Mage",
+      "Anti-Mage",
+      "Queen of Pain",
+      "Mirana",
+      "Vengeful Spirit"
+    ]
+  },
+  "Crystal Maiden": {
+    "note": "Предрасовщица; нужен острый удар и защита от блинов/невидимости.",
+    "counters": [
+      "Clockwerk",
+      "Storm Spirit",
+      "Anti-Mage",
+      "Pudge",
+      "Spirit Breaker",
+      "Nyx Assassin",
+      "Silencer"
+    ]
+  },
+  "Dark Seer": {
+    "note": "Пушит и сбивает с места; нужна блокировка и удары по выносливости.",
+    "counters": [
+      "Oracle",
+      "Rubick",
+      "Silencer",
+      "Lifestealer",
+      "Juggernaut",
+      "Anti-Mage",
+      "Phantom Lancer"
+    ]
+  },
+  "Dark Willow": {
+    "note": "Мгновенный залп и пассив; ставит на расстояние.",
+    "counters": [
+      "Storm Spirit",
+      "Anti-Mage",
+      "Spectre",
+      "Clockwerk",
+      "Night Stalker",
+      "Slark",
+      "Puck"
+    ]
+  },
+  "Dawnbreaker": {
+    "note": "Не умеет в медленных и стратегических героев.",
+    "counters": [
+      "Silencer",
+      "Winter Wyvern",
+      "Elder Titan",
+      "Ancient Apparition",
+      "Naga Siren",
+      "Disruptor"
+    ]
+  },
+  "Disruptor": {
+    "note": "Долгие анимации и капсулы сдерживает тактика.",
+    "counters": [
+      "Anti-Mage",
+      "Storm Spirit",
+      "Puck",
+      "Spectre",
+      "Nyx Assassin",
+      "Clockwerk",
+      "Lifestealer"
+    ]
+  },
+  "Doom": {
+    "note": "Низкая защита и колдовство; нужна защита и удары по выносливости.",
+    "counters": [
+      "Lifestealer",
+      "Timbersaw",
+      "Anti-Mage",
+      "Phantom Lancer",
+      "Terrorblade",
+      "Shadow Demon"
+    ]
+  },
+  "Dragon Knight": {
+    "note": "Уязвим до полной прокупки; нужны удары и разъёмы.",
+    "counters": [
+      "Timbersaw",
+      "Sven",
+      "Anti-Mage",
+      "Dragon Knight"
+    ]
+  },
+  "Drow Ranger": {
+    "note": "Не умеет в крип и предки; плохо отвечает на гангеры.",
+    "counters": [
+      "Vengeful Spirit",
+      "Wisp",
+      "Void Spirit",
+      "Dragon Knight"
+    ]
+  },
+  "Earthshaker": {
+    "note": "Группировки отбиваются; нужны разъёмы и разрушение.",
+    "counters": [
+      "Abaddon",
+      "Dazzle",
+      "Tidehunter",
+      "Storm Spirit",
+      "Sven",
+      "Luna"
+    ]
+  },
+  "Elder Titan": {
+    "note": "Мегабой и щиты; нужна защита и разъёмы.",
+    "counters": [
+      "Rubick",
+      "Puck",
+      "Queen of Pain",
+      "Storm Spirit"
+    ]
+  },
+  "Ember Spirit": {
+    "note": "Огненная атака и пьяная кровь; нужна защита.",
+    "counters": [
+      "Phantom Lancer",
+      "Naga Siren",
+      "Terrorblade",
+      "Doom",
+      "Disruptor",
+      "Clinkz",
+      "Riki",
+      "Storm Spirit",
+      "Legion Commander"
+    ]
+  },
+  "Enchantress": {
+    "note": "Вероятный и агрессивный; нужна защита и пресечение.",
+    "counters": [
+      "Ancient Apparition",
+      "Axe",
+      "Phantom Assassin",
+      "Sniper",
+      "Lina",
+      "Lion",
+      "Nyx Assassin",
+      "Primal Beast"
+    ]
+  },
+  "Enigma": {
+    "note": "Не умеет в долгую атаку и ауру; ведёт и опасно в одиночку.",
+    "counters": [
+      "Sand King",
+      "Beastmaster",
+      "Luna"
+    ]
+  },
+  "Faceless Void": {
+    "note": "Нужна мешалка и захват; без них не выживает в одиночку.",
+    "counters": [
+      "Abaddon",
+      "Earthshaker",
+      "Dragon Knight",
+      "Slark",
+      "Slardar",
+      "Clockwerk",
+      "Skywrath Mage"
+    ]
+  },
+  "Grimstroke": {
+    "note": "Долгие анимации и колдовство; нужна тактика.",
+    "counters": [
+      "Anti-Mage",
+      "Storm Spirit",
+      "Puck",
+      "Spectre",
+      "Nyx Assassin",
+      "Lifestealer",
+      "Juggernaut"
+    ]
+  },
+  "Gyrocopter": {
+    "note": "Не умеет в одиночные удары; ротит и обходит.",
+    "counters": [
+      "Tidehunter",
+      "Batrider",
+      "Viper",
+      "Venomancer",
+      "Warlock",
+      "Outworld Destroyer"
+    ]
+  },
+  "Huskar": {
+    "note": "Жертвует себе, нужен чистый урон разломительный или защита.",
+    "counters": [
+      "Timbersaw",
+      "Bane",
+      "Enchantress",
+      "Outworld Destroyer",
+      "Templar Assassin"
+    ]
+  },
+  "Invoker": {
+    "note": "Зависит от маны и атаки; без маны не выживает в бою.",
+    "counters": [
+      "Anti-Mage",
+      "Nyx Assassin",
+      "Storm Spirit",
+      "Puck",
+      "Silencer",
+      "Doom",
+      "Spectre"
+    ]
+  },
+  "Jakiro": {
+    "note": "Травмирует и замедляет; нужна защита и разъёмы.",
+    "counters": [
+      "Lich",
+      "Anti-Mage",
+      "Clockwerk",
+      "Enigma",
+      "Lifestealer",
+      "Night Stalker"
+    ]
+  },
+  "Juggernaut": {
+    "note": "Пассивное превращение; нужна защита и разъёмы.",
+    "counters": [
+      "Lich",
+      "Slark",
+      "Slardar",
+      "Night Stalker"
+    ]
+  },
+  "Leshrac": {
+    "note": "Опасается рифтов и таймбомбов.",
+    "counters": [
+      "Clockwerk",
+      "Rubick"
+    ]
+  },
+  "Lifestealer": {
+    "note": "Оставляет неуязвимость и разбой; нужна магическая блокировка.",
+    "counters": [
+      "Beastmaster",
+      "Bane",
+      "Enchantress",
+      "Zeus",
+      "Riki"
+    ]
+  },
+  "Lina": {
+    "note": "Мощный шорт-дакка и прыжок; нужна защита и анти-боттл.",
+    "counters": [
+      "Anti-Mage",
+      "Ogre Magi"
+    ]
+  },
+  "Lion": {
+    "note": "Пассивная безопасность; нужны разъёмы и удары по выносливости.",
+    "counters": [
+      "Anti-Mage",
+      "Silencer",
+      "Storm Spirit",
+      "Bane"
+    ]
+  },
+  "Luna": {
+    "note": "Вулканический огонь и клен; замедление через клен.",
+    "counters": [
+      "Slark",
+      "Bane",
+      "Puck"
+    ]
+  },
+  "Lycan": {
+    "note": "Пушит и разрывает; нужны те года и удары по выносливости.",
+    "counters": [
+      "Medusa"
+    ]
+  },
+  "Magnus": {
+    "note": "Цветение и кража; нужна удалённая просадка и мана.",
+    "counters": [
+      "Rubick",
+      "Anti-Mage"
+    ]
+  },
+  "Marci": {
+    "note": "Самый слабый боец; нужна уклончивость и разъёмчик.",
+    "counters": [
+      "Bloodseeker",
+      "Dark Willow",
+      "Death Prophet",
+      "Axe",
+      "Lycan",
+      "Lifestealer"
+    ]
+  },
+  "Medusa": {
+    "note": "Одиночный залп и неуязвимость; нужна корость и пресечение.",
+    "counters": [
+      "Outworld Destroyer",
+      "Wisp",
+      "Void Spirit",
+      "Riki"
+    ]
+  },
+  "Meepo": {
+    "note": "Мультиформа; нужен одиночный удар и разъёмчик.",
+    "counters": [
+      "Sniper",
+      "Anti-Mage",
+      "Crystal Maiden"
+    ]
+  },
+  "Morphling": {
+    "note": "Изменение формы и урона; нужен низкий пул HP и блокировка.",
+    "counters": [
+      "Abaddon",
+      "Silencer",
+      "Lich"
+    ]
+  },
+  "Naga Siren": {
+    "note": "Открыт для ударов по выносливости; нужна защита.",
+    "counters": [
+      "Luna",
+      "Ember Spirit",
+      "Shadow Fiend",
+      "Tidehunter",
+      "Lina"
+    ]
+  },
+  "Necrophos": {
+    "note": "Пассивная невидимость и кошмары; нужна тактика.",
+    "counters": [
+      "Anti-Mage",
+      "Doom",
+      "Clockwerk",
+      "Slark",
+      "Ursa"
+    ]
+  },
+  "Night Stalker": {
+    "note": "Тормозит и пассивно целится; нужна блокировка.",
+    "counters": [
+      "Luna",
+      "Slark",
+      "Slardar"
+    ]
+  },
+  "Nyx Assassin": {
+    "note": "Невидимость и грабари; нужна тактика и пресечение.",
+    "counters": [
+      "Anti-Mage",
+      "Storm Spirit",
+      "Clockwerk",
+      "Spectre"
+    ]
+  },
+  "Outworld Destroyer": {
+    "note": "Уникальный выстрел и неуязвимость; нужна корость и пресечение.",
+    "counters": [
+      "Riki",
+      "Viper",
+      "Wisp",
+      "Void Spirit"
+    ]
+  },
+  "Outworld Devourer": {
+    "note": "Пассивное заражение; нужна блокировка и разъёмы.",
+    "counters": [
+      "Viper",
+      "Venomancer",
+      "Dark Seer",
+      "Jakiro"
+    ]
+  },
+  "Pangolier": {
+    "note": "Высокая атака и защита; нужна тактика.",
+    "counters": [
+      "Clockwerk",
+      "Abaddon",
+      "Outworld Destroyer"
+    ]
+  },
+  "Phantom Assassin": {
+    "note": "Неуязвим в лане и колдовство; нужны пресечение и угроза.",
+    "counters": [
+      "Lich",
+      "Dark Seer",
+      "Puck",
+      "Anti-Mage"
+    ]
+  },
+  "Phantom Lancer": {
+    "note": "Опасен в одиночку; нужен аура и групповой урон.",
+    "counters": [
+      "Clockwerk",
+      "Lifestealer",
+      "Templar Assassin",
+      "Vengeful Spirit"
+    ]
+  },
+  "Phoenix": {
+    "note": "Восстановление жизни; нужна защита и поражение.",
+    "counters": [
+      "Dragon Knight",
+      "Juggernaut",
+      "Meepo",
+      "Troll Warlord",
+      "Huskar",
+      "Clinkz",
+      "Tidehunter"
+    ]
+  },
+  "Primal Beast": {
+    "note": "Лютый контакт и урон; нужна защита и удары по выносливости.",
+    "counters": [
+      "Lina",
+      "Timbersaw",
+      "Medusa"
+    ]
+  },
+  "Puck": {
+    "note": "Желание и запутывание; нужна защита и убийство.",
+    "counters": [
+      "Anti-Mage",
+      "Storm Spirit",
+      "Clockwerk",
+      "Pudge",
+      "Nyx Assassin"
+    ]
+  },
+  "Pudge": {
+    "note": "Мертвая зона и урон по выносливости; нужна защита.",
+    "counters": [
+      "Crystal Maiden",
+      "Nyx Assassin",
+      "Storm Spirit",
+      "Anti-Mage",
+      "Spectre"
+    ]
+  },
+  "Pugna": {
+    "note": "Мощное колдовство; нужна защита и удары по выносливости.",
+    "counters": [
+      "Anti-Mage",
+      "Nyx Assassin",
+      "Storm Spirit",
+      "Puck",
+      "Silencer",
+      "Doom",
+      "Spectre"
+    ]
+  },
+  "Queen of Pain": {
+    "note": "Урон и борьба; нужна защита и удары по выносливости.",
+    "counters": [
+      "Shadow Fiend",
+      "Puck",
+      "Invoker",
+      "Clockwerk",
+      "Storm Spirit",
+      "Pudge"
+    ]
+  },
+  "Riki": {
+    "note": "Мгновенный залп и скрытность; нужна защита и корость.",
+    "counters": [
+      "Anti-Mage",
+      "Vengeful Spirit"
+    ]
+  },
+  "Slark": {
+    "note": "Оглушение и погоня; нужна защита и пресечение.",
+    "counters": [
+      "Bloodseeker",
+      "Slardar",
+      "Night Stalker"
+    ]
+  },
+  "Sven": {
+    "note": "Низкая мана и медь; нужна защита и дротик.",
+    "counters": [
+      "Earthshaker",
+      "Silencer",
+      "Abaddon",
+      "Dragon Knight",
+      "Lich"
+    ]
+  },
+  "Templar Assassin": {
+    "note": "Грабли и колдовство; нужна защита и разъёмчик.",
+    "counters": [
+      "Huskar",
+      "Drow Ranger",
+      "Skywrath Mage",
+      "Bloodseeker"
+    ]
+  },
+  "Terrorblade": {
+    "note": "Огонь и скелет; нужна защита и корость.",
+    "counters": [
+      "Lina",
+      "Luna",
+      "Phantom Lancer"
+    ]
+  },
+  "Timbersaw": {
+    "note": "Огненные выстрелы; нужна оглушение и пресечение.",
+    "counters": [
+      "Drow Ranger",
+      "Skywrath Mage",
+      "Bloodseeker"
+    ]
+  },
+  "Tidehunter": {
+    "note": "Благородство и урон; нужна защита и тормоз.",
+    "counters": [
+      "Viper",
+      "Naga Siren",
+      "Slardar"
+    ]
+  },
+  "Tinkerer": {
+    "note": "Магическая и физическая атака; нужна защита.",
+    "counters": [
+      "Clockwerk",
+      "Leshrac"
+    ]
+  },
+  "Treant Protector": {
+    "note": "Надежный щит; нужна защита и разъёмы.",
+    "counters": [
+      "Lich",
+      "Slark",
+      "Slardar",
+      "Night Stalker"
+    ]
+  },
+  "Troll Warlord": {
+    "note": "Легендарный урон и боевые несколько; нужна защита.",
+    "counters": [
+      "Dragon Knight",
+      "Huskar",
+      "Meepo",
+      "Phoenix",
+      "Clinkz",
+      "Tidehunter"
+    ]
+  },
+  "Ursa": {
+    "note": "Пассивные колдовства и разбой; нужна защита.",
+    "counters": [
+      "Alchemist",
+      "Slardar",
+      "Axe",
+      "Necrophos",
+      "Legion Commander",
+      "Timbersaw",
+      "Ancient Apparition"
+    ]
+  },
+  "Vengeful Spirit": {
+    "note": "Дым и выносливость; нужна защита.",
+    "counters": [
+      "Lina",
+      "Luna",
+      "Phantom Lancer"
+    ]
+  },
+  "Venomancer": {
+    "note": "Отравление и невидимость; нужна защита.",
+    "counters": [
+      "Lina",
+      "Necrophos",
+      "Skywrath Mage"
+    ]
+  },
+  "Viper": {
+    "note": "Чистый урон и невидимость; нужна защита.",
+    "counters": [
+      "Venomancer",
+      "Ogre Magi",
+      "Dark Seer",
+      "Jakiro"
+    ]
+  },
+  "Void Spirit": {
+    "note": "Низкая атака; нужна защита.",
+    "counters": [
+      "Lina",
+      "Luna",
+      "Phantom Lancer"
+    ]
+  },
+  "Warlock": {
+    "note": "Слабая атака; нужна защита.",
+    "counters": [
+      "Lina",
+      "Luna",
+      "Phantom Lancer"
+    ]
+  },
+  "Weaver": {
+    "note": "Ток и короткие анимации; нужна защита.",
+    "counters": [
+      "Lina",
+      "Necrophos",
+      "Skywrath Mage"
+    ]
+  },
+  "Windranger": {
+    "note": "Эффективная атака; нужна защита.",
+    "counters": [
+      "Lina",
+      "Necrophos",
+      "Skywrath Mage"
+    ]
+  },
+  "Winter Wyvern": {
+    "note": "Зимний огонь; нужна защита.",
+    "counters": [
+      "Silencer",
+      "Dawnbreaker",
+      "Elder Titan",
+      "Ancient Apparition",
+      "Naga Siren",
+      "Disruptor"
+    ]
+  },
+  "Witch Doctor": {
+    "note": "Низкая атака; нужна защита.",
+    "counters": [
+      "Lina",
+      "Necrophos",
+      "Skywrath Mage"
+    ]
+  },
+  "Wraith King": {
+    "note": "Низкая атака; нужна защита.",
+    "counters": [
+      "Lina",
+      "Necrophos",
+      "Skywrath Mage"
+    ]
+  },
+  "Zeus": {
+    "note": "Высокая атака; нужна защита.",
+    "counters": [
+      "Lina",
+      "Necrophos",
+      "Skywrath Mage"
+    ]
+  },
+  "Ancient Apparition": {
+    "note": "Медленный и слабый на старте; тормозит раннюю игру.",
+    "counters": [
+      "Storm Spirit",
+      "Anti-Mage",
+      "Phantom Assassin",
+      "Spectre",
+      "Clockwerk",
+      "Spirit Breaker",
+      "Nyx Assassin"
+    ]
+  },
+  "Kunkka": {
+    "note": "Неуязвим и устойчив; нужны разъёмы и удары по свинту.",
+    "counters": [
+      "Gyrocopter",
+      "Bristleback",
+      "Axe"
+    ]
+  },
+  "Lich": {
+    "note": "Ледяная защита; нужны глубокие удары и разблокировка льда.",
+    "counters": [
+      "Bane",
+      "Enigma",
+      "Rubick",
+      "Lina"
+    ]
+  },
+  "Mirana": {
+    "note": "Острая и ловкая; нужна защита от хитростей и добавления.",
+    "counters": [
+      "Phantom Assassin",
+      "Lich",
+      "Night Stalker",
+      "Sniper"
+    ]
+  },
+  "Omniknight": {
+    "note": "Уязвим от склейки и ледяного умения; нужна защита.",
+    "counters": [
+      "Sniper",
+      "Bane",
+      "Timbersaw"
+    ]
+  },
+  "Undying": {
+    "note": "Тень смерти важна; нужны разъёмы и убийство гробницы.",
+    "counters": [
+      "Bristleback",
+      "Axe",
+      "Gyrocopter"
+    ]
+  },
+  "Shadow Fiend": {
+    "note": "Чёрное и неуязвимое; нужны урон и отвлечение охоты.",
+    "counters": [
+      "Riki",
+      "Lina",
+      "Viper"
+    ]
+  },
+  "Shadow Demon": {
+    "note": "Разрушение и разлупы; нужна защита и уклон.",
+    "counters": [
+      "Riki",
+      "Viper",
+      "Outworld Destroyer"
+    ]
+  },
+  "Silencer": {
+    "note": "Оглушение и капсулы; нужна защита и противодействие.",
+    "counters": [
+      "Enigma",
+      "Leshrac",
+      "Magnus",
+      "Omniknight"
+    ]
+  },
+  "Skywrath Mage": {
+    "note": "Медленный маг; нужна защита от близости и магии.",
+    "counters": [
+      "Leshrac",
+      "Riki",
+      "Tusk"
+    ]
+  },
+  "Sniper": {
+    "note": "Дальний урон; нужна защита в браке и ближнем бою.",
+    "counters": [
+      "Riki",
+      "Tidehunter",
+      "Luna",
+      "Night Stalker"
+    ]
+  },
+  "Spirit Breaker": {
+    "note": "Пробивает и пьет; нужна защита и удары по выносливости.",
+    "counters": [
+      "Bane",
+      "Slark",
+      "Tidehunter",
+      "Night Stalker"
+    ]
+  },
+  "Kez": {
+      "note": "Мобильный мана-маг; контрят иллюзионщики, массовые дамагеры, сайленсеры, манабернеры и герои с контролем.",
+      "counters": [
+      "Arc Warden",
+      "Spectre",
+      "Leshrac",
+      "Naga Siren",
+      "Sand King",
+      "Drow Ranger",
+      "Tidehunter",
+      "Shadow Shaman",
+      "Medusa",
+      "Muerta",
+      "Necrophos",
+      "Phantom Assassin",
+      "Vengeful Spirit",
+      "Monkey King",
+      "Slark",
+      "Legion Commander",
+      "Abaddon",
+      "Terrorblade",
+      "Windranger",
+      "Gyrocopter",
+      "Sniper",
+      "Dark Willow",
+      "Troll Warlord",
+      "Outworld Destroyer",
+      "Ancient Apparition",
+      "Mirana",
+      "Death Prophet",
+      "Dragon Knight",
+      "Ursa",
+      "Phoenix",
+      "Riki",
+      "Disruptor",
+      "Lion",
+      "Ogre Magi",
+      "Zeus",
+      "Night Stalker",
+      "Winter Wyvern",
+      "Lina",
+      "Techies",
+      "Bristleback",
+      "Juggernaut",
+      "Faceless Void",
+      "Witch Doctor",
+      "Clockwerk",
+      "Oracle",
+      "Bane",
+      "Luna",
+      "Weaver",
+      "Underlord",
+      "Doom",
+      "Huskar",
+      "Grimstroke",
+      "Spirit Breaker",
+      "Morphling",
+      "Clinkz",
+      "Rubick",
+      "Sven",
+      "Slardar"
+    ]
+  }
+}

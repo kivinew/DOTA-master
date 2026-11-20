@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}DOTA_MASTER — Критические ошибки{% endblock %}
+
+{% block content %}
+<a href="/" class="back-btn">← Дашборд</a>
+<h1 class="page-title">⚠️ Критические ошибки</h1>
+<p class="page-subtitle">Игры с серьёзными ошибками — требуется внимание и анализ</p>
+
+{% if errors %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Игр с ошибками</div>
+        <div class="stat-value">{{ total_errors }}</div>
+        <div class="stat-sub">из {{ total_games }} всего</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Типов ошибок</div>
+        <div class="stat-value stat-value-sm">—</div>
+        <div class="stat-sub">смотри список ниже</div>
+    </div>
+</div>
+
+<div class="dota-section">
+    <div class="dota-section-title">📋 Список проблемных игр ({{ errors|length }})</div>
+    <table class="dota-table">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Герой</th>
+                <th class="center">Результат</th>
+                <th class="num">K</th>
+                <th class="num">D</th>
+                <th class="num">A</th>
+                <th>Ошибки</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in errors[:50] %}
+            {% set eslug = hero_slug(e.hero) %}
+            <tr>
+                <td class="muted fs-sm">
+                    {{ e.date[:10] if e.date else '—' }}
+                </td>
+                <td>
+                    <div class="hero-cell">
+                        <img class="hero-thumb"
+                             src="{{ hero_img_url(e.hero) }}"
+                             alt="{{ e.hero }}"
+                             onerror="this.style.display='none'">
+                        <span><strong>{{ e.hero }}</strong></span>
+                    </div>
+                </td>
+                <td class="center">
+                    {% if e.result == 'win' %}
+                    <span class="result-win">V</span>
+                    {% else %}
+                    <span class="result-loss">X</span>
+                    {% endif %}
+                </td>
+                <td class="num">{{ e.kills }}</td>
+                <td class="num">{{ e.deaths }}</td>
+                <td class="num">{{ e.assists }}</td>
+                <td>
+                    {% for err in e.errors %}
+                    <span class="error-pill">{{ err }}</span>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="dota-section">
+    <div class="dota-section-title">💡 Рекомендации</div>
+    <div class="tip-box">
+        <strong>Основные проблемы:</strong><br>
+        • <strong>Позиционирование:</strong> слишком много смертей (8+) — улучшить позиционирование, избегать одиночных вылазок без поддержки<br>
+
+        • <strong>RoTL:</strong> данные не собраны — для точного анализа нужно отслеживать урон по линии после каждой игры<br>
+        • <strong>GPM/XPM:</strong> данные не собраны — нужно собирать статистику из реплеев или OpenDota
+    </div>
+    <div class="tip-box">
+        <strong>Что делать:</strong><br>
+        • После каждой игры с 8+ смертями проанализируйте, почему вы умерли (позиция, отсутствие поддержки)<br>
+        • Смотрите переигрываниеown смертей на реплее — часто видишь свои ошибки<br>
+        • Для Пуги: используйте заморозку в составе, не замораживайте в одиночку без бэк-линии<br>
+        • Добавьте GPM, XPM, last_hits, RoTL вручную после игры — это даст намного более точный анализ
+    </div>
+</div>
+{% else %}
+<div class="dota-section">
+    <div class="empty-state">
+        <div class="icon">✅</div>
+        <p>Критических ошибок не найдено! Отличная игра 🎉</p>
+        <p class="fs-sm mt-sm">Ошибки отслеживаются только при наличии данных (deaths > 7, RoTL < 10).</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

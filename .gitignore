@@ -1,0 +1,17 @@
+# DOTA_MASTER .gitignore — локальные данные и артефакты, не коммитить
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Локальная база игр и кэши OpenDota
+games/*.json
+!games/.gitkeep
+
+# Логи сервера
+server.log
+*.log
+
+# Локальное окружение
+.env

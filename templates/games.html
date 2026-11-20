@@ -1,0 +1,150 @@
+﻿{% extends "base.html" %}
+
+{% block title %}DOTA_MASTER — Все игры{% endblock %}
+
+{% block content %}
+<a href="/" class="back-btn">← Назад к дашборду</a>
+<h1 class="page-title">📋 Все игры</h1>
+<p class="page-subtitle">Полный список игр в базе DOTA_MASTER ({{ total_games }} игр)</p>
+
+<!-- Filters Section -->
+<div class="dota-section" style="margin-bottom: 1.5rem;">
+    <div class="dota-section-title">🔍 Фильтры</div>
+    <form id="games-filter-form" class="filter-form" method="GET" action="/games">
+        <div class="filter-row" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+            <div class="filter-group" style="flex: 1; min-width: 180px;">
+                <label for="hero-filter" class="muted fs-xs" style="display: block; margin-bottom: 0.3rem;">Герой</label>
+                <select id="hero-filter" name="hero" class="filter-select" style="width: 100%; padding: 0.5rem; background: var(--dota-input-bg); border: 1px solid var(--dota-input-border); border-radius: 4px; color: var(--dota-text); font-size: 0.85rem;">
+                    <option value="">— Все герои —</option>
+                    {% for h in all_heroes %}
+                    <option value="{{ h }}" {% if request.args.get('hero') == h %}selected{% endif %}>{{ h }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 150px;">
+                <label for="result-filter" class="muted fs-xs" style="display: block; margin-bottom: 0.3rem;">Результат</label>
+                <select id="result-filter" name="result" class="filter-select" style="width: 100%; padding: 0.5rem; background: var(--dota-input-bg); border: 1px solid var(--dota-input-border); border-radius: 4px; color: var(--dota-text); font-size: 0.85rem;">
+                    <option value="">— Все —</option>
+                    <option value="win" {% if request.args.get('result') == 'win' %}selected{% endif %}>✅ Победа</option>
+                    <option value="loss" {% if request.args.get('result') == 'loss' %}selected{% endif %}>❌ Поражение</option>
+                </select>
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 140px;">
+                <label for="date-from" class="muted fs-xs" style="display: block; margin-bottom: 0.3rem;">Дата от</label>
+                <input type="date" id="date-from" name="date_from" value="{{ request.args.get('date_from', '') }}" class="filter-input" style="width: 100%; padding: 0.5rem; background: var(--dota-input-bg); border: 1px solid var(--dota-input-border); border-radius: 4px; color: var(--dota-text); font-size: 0.85rem;">
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 140px;">
+                <label for="date-to" class="muted fs-xs" style="display: block; margin-bottom: 0.3rem;">Дата до</label>
+                <input type="date" id="date-to" name="date_to" value="{{ request.args.get('date_to', '') }}" class="filter-input" style="width: 100%; padding: 0.5rem; background: var(--dota-input-bg); border: 1px solid var(--dota-input-border); border-radius: 4px; color: var(--dota-text); font-size: 0.85rem;">
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 140px;">
+                <label for="min-kda" class="muted fs-xs" style="display: block; margin-bottom: 0.3rem;">Мин. KDA</label>
+                <input type="number" id="min-kda" name="min_kda" step="0.1" min="0" value="{{ request.args.get('min_kda', '') }}" class="filter-input" placeholder="0.0" style="width: 100%; padding: 0.5rem; background: var(--dota-input-bg); border: 1px solid var(--dota-input-border); border-radius: 4px; color: var(--dota-text); font-size: 0.85rem;">
+            </div>
+            <div class="filter-group" style="flex: 1; min-width: 140px;">
+                <label for="max-kda" class="muted fs-xs" style="display: block; margin-bottom: 0.3rem;">Макс. KDA</label>
+                <input type="number" id="max-kda" name="max_kda" step="0.1" min="0" value="{{ request.args.get('max_kda', '') }}" class="filter-input" placeholder="99.9" style="width: 100%; padding: 0.5rem; background: var(--dota-input-bg); border: 1px solid var(--dota-input-border); border-radius: 4px; color: var(--dota-text); font-size: 0.85rem;">
+            </div>
+            <div class="filter-group" style="min-width: 120px;">
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.5rem 1rem;">🔍 Применить</button>
+            </div>
+            <div class="filter-group" style="min-width: 120px;">
+                <a href="/games" class="btn" style="width: 100%; text-align: center; padding: 0.5rem 1rem;">✕ Сбросить</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% if games %}
+<div class="dota-section">
+    <div class="dota-section-title">📊 Игры (страница {{ page }}{% if total_pages > 1 %} из {{ total_pages }}{% endif %})</div>
+    <table class="dota-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Дата</th>
+                <th>Герой</th>
+                <th class="center">Результат</th>
+                <th class="num">K</th>
+                <th class="num">D</th>
+                <th class="num">A</th>
+                <th class="num">KDA</th>
+                <th>Мода</th>
+                <th class="center">Роль</th>
+                <th class="center">Страница</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in games %}
+            {% set gslug = hero_slug(g.hero) %}
+            <tr class="match-row-clickable" data-match-id="{{ g.match_id }}" onclick="window.location.href='/match/' + g.match_id">
+                <td class="muted">
+                    {{ (page-1)*per_page + loop.index }}
+                </td>
+                <td class="muted fs-sm">
+                    {{ g.date[:10] if g.date else '—' }}
+                </td>
+                <td>
+                    <div class="hero-cell">
+                        <img class="hero-thumb"
+                             src="{{ hero_img_url(g.hero) }}"
+                             alt="{{ g.hero }}"
+                             onerror="this.style.display='none'">
+                        <span>{{ g.hero }}</span>
+                    </div>
+                </td>
+                <td class="center">
+                    {% if g.result == 'win' %}
+                    <span class="result-win">V</span>
+                    {% else %}
+                    <span class="result-loss">X</span>
+                    {% endif %}
+                </td>
+                <td class="num">{{ g.kills }}</td>
+                <td class="num">{{ g.deaths }}</td>
+                <td class="num">{{ g.assists }}</td>
+                <td class="num">
+                    {% set _kda = (g.kills + g.assists) / (g.deaths if g.deaths > 0 else 1) %}
+                    {{ "%.1f"|format(_kda) }}
+                </td>
+                <td class="muted fs-sm">
+                    {{ game_mode_name(g.game_mode) or '—' }}
+                </td>
+                <td class="center fs-sm">
+                    {{ g.role or '—' }}
+                </td>
+                <td class="center">
+                    {% if g.notes %}
+                    <span class="fs-xs gold" title="{{ g.notes }}">📝</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if total_games > per_page %}
+    <div class="pagination">
+        {% set total_pages = (total_games + per_page - 1) // per_page %}
+        <button {% if page <= 1 %}disabled{% endif %}
+                onclick="location.href='/games?page={{ page-1 }}&hero={{ request.args.get('hero', '') }}&result={{ request.args.get('result', '') }}&date_from={{ request.args.get('date_from', '') }}&date_to={{ request.args.get('date_to', '') }}&min_kda={{ request.args.get('min_kda', '') }}&max_kda={{ request.args.get('max_kda', '') }}'">← Назад</button>
+        {% for p in range(1, total_pages+1) %}
+        <button class="{% if p == page %}active{% endif %}"
+                onclick="location.href='/games?page={{ p }}&hero={{ request.args.get('hero', '') }}&result={{ request.args.get('result', '') }}&date_from={{ request.args.get('date_from', '') }}&date_to={{ request.args.get('date_to', '') }}&min_kda={{ request.args.get('min_kda', '') }}&max_kda={{ request.args.get('max_kda', '') }}'">
+            {{ p }}
+        </button>
+        {% endfor %}
+        <button {% if page * per_page >= total_games %}disabled{% endif %}
+                onclick="location.href='/games?page={{ page+1 }}&hero={{ request.args.get('hero', '') }}&result={{ request.args.get('result', '') }}&date_from={{ request.args.get('date_from', '') }}&date_to={{ request.args.get('date_to', '') }}&min_kda={{ request.args.get('min_kda', '') }}&max_kda={{ request.args.get('max_kda', '') }}'">Вперёд →</button>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<div class="dota-section">
+    <div class="empty-state">
+        <div class="icon">📭</div>
+        <p>Игр не найдено. Попробуйте изменить фильтры или подождите автообновления.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

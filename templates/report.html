@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}DOTA_MASTER — Полный отчёт{% endblock %}
+
+{% block content %}
+<a href="/" class="back-btn">← Дашборд</a>
+<h1 class="page-title">📋 Полный отчёт</h1>
+<p class="page-subtitle">Развёрнутый анализ матчей с рекомендациями</p>
+
+{% if report.error %}
+<div class="dota-section">
+    <div class="empty-state">
+        <div class="icon">📭</div>
+        <p>{{ report.error }}</p>
+    </div>
+</div>
+{% else %}
+
+<div class="dota-section">
+    <div class="dota-section-title">📊 Сводка ({{ report.matches_analyzed }} матчей)</div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Винрейт</div>
+            <div class="stat-value {% if report.win_rate >= 50 %}result-win{% else %}result-loss{% endif %}">{{ report.win_rate }}%</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Средний KDA</div>
+            <div class="stat-value">{{ report.avg_kda }}</div>
+            <div class="stat-sub">цель: 3.5+</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Средний GPM</div>
+            <div class="stat-value">{{ report.avg_gpm }}</div>
+            <div class="stat-sub">цель: 600+</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Средний XPM</div>
+            <div class="stat-value">{{ report.avg_xpm }}</div>
+            <div class="stat-sub">цель: 700+</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Lasthits/мин</div>
+            <div class="stat-value">{{ report.avg_lhpm }}</div>
+            <div class="stat-sub">цель: 6.0+</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Смертей за игру</div>
+            <div class="stat-value {% if report.avg_deaths > 7 %}result-loss{% endif %}">{{ report.avg_deaths }}</div>
+            <div class="stat-sub">цель: ≤4</div>
+        </div>
+    </div>
+</div>
+
+<!-- Тренд -->
+<div class="dota-section">
+    <div class="dota-section-title">📈 Тренд</div>
+    {% if report.gpm_trend > 0 %}
+    <div class="tip-box ok">📈 GPM растёт (+{{ report.gpm_trend }}) — фармишь эффективнее.</div>
+    {% elif report.gpm_trend < 0 %}
+    <div class="tip-box warn">📉 GPM падает ({{ report.gpm_trend }}) — нужно больше фарма.</div>
+    {% endif %}
+    {% if report.deaths_trend > 0 %}
+    <div class="tip-box bad">💀 Смертей стало больше (+{{ report.deaths_trend }}) — будь осторожнее.</div>
+    {% elif report.deaths_trend < 0 %}
+    <div class="tip-box ok">✅ Смертей стало меньше ({{ report.deaths_trend }}) — молодец!</div>
+    {% endif %}
+</div>
+
+<!-- Критические ошибки -->
+{% if report.critical_errors %}
+<div class="dota-section">
+    <div class="dota-section-title">🔴 Критические ошибки</div>
+    {% for err in report.critical_errors %}
+    <div class="error-card">
+        <div class="error-card-title">{{ err.issue }}</div>
+        <div class="error-card-body">
+            <div class="error-stat"><strong>Текущее:</strong> {{ err.value }}</div>
+            <div class="error-stat"><strong>Цель:</strong> {{ err.target }}</div>
+            <div class="error-fix"><strong>Как исправить:</strong> {{ err.fix }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Частые проблемы -->
+{% if report.error_counter %}
+<div class="dota-section">
+    <div class="dota-section-title">⚠️ Частые проблемы</div>
+    <div class="error-list">
+    {% for err, count in report.error_counter.items() %}
+        <div class="error-item">
+            <span class="error-name">
+            {% if err == 'gpm' %}📉 Низкий GPM
+            {% elif err == 'xpm' %}📉 Низкий XPM
+            {% elif err == 'lhpm' %}⚒️ Мало ластхитов
+            {% elif err == 'deaths' %}💀 Много смертей
+            {% elif err == 'td' %}🏰 Мало урона по башням
+            {% elif err == 'dpm' %}⚔️ Мало урона по героям
+            {% elif err == 'kda' %}📊 Низкий KDA
+            {% elif err == 'kill_part' %}🤝 Низкий вклад в убийства
+            {% else %}{{ err }}{% endif %}
+            </span>
+            <span class="error-count">{{ count }} из {{ report.matches_analyzed }} матчей</span>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Лучший/худший матч -->
+<div class="dota-section">
+    <div class="dota-section-title">🏆 Лучший и худший</div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Лучший KDA</div>
+            <div class="stat-value result-win">{{ report.best_kda.kda }}</div>
+            <div class="stat-sub">{{ report.best_kda.hero }} (<a href="/match/{{ report.best_kda.match_id }}" class="gold">#{{ report.best_kda.match_id }}</a>)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Худший KDA</div>
+            <div class="stat-value result-loss">{{ report.worst_kda.kda }}</div>
+            <div class="stat-sub">{{ report.worst_kda.hero }} (<a href="/match/{{ report.worst_kda.match_id }}" class="gold">#{{ report.worst_kda.match_id }}</a>)</div>
+        </div>
+    </div>
+</div>
+
+<!-- Текстовый отчёт -->
+<div class="dota-section">
+    <div class="dota-section-title">📝 Текстовый отчёт</div>
+    <div class="report-text">
+    {{ report.report | safe }}
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}

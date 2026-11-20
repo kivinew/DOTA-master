@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}DOTA_MASTER — Свежие матчи{% endblock %}
+
+{% block content %}
+<a href="/" class="back-btn">← Дашборд</a>
+<h1 class="page-title">🔄 Свежие матчи</h1>
+<p class="page-subtitle">Последние матчи, загруженные с OpenDota (сырые данные перед обработкой)</p>
+
+<div class="dota-section">
+    <div class="dota-section-title">📡 Источник данных</div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Account ID</div>
+            <div class="stat-value stat-value-sm">{{ account_id or '—' }}</div>
+            <div class="stat-sub">SteamID32</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Матчей в файле</div>
+            <div class="stat-value">{{ fresh_matches|length }}</div>
+            <div class="stat-sub">в fresh_matches.json</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Источник</div>
+            <div class="stat-value stat-value-xs">OpenDota</div>
+            <div class="stat-sub">https://api.opendota.com/api/players/41099157/recentMatches</div>
+        </div>
+    </div>
+    <div class="tip-box fs-sm mt-md">
+        <strong>Примечание:</strong> Эти матчи загружены через OpenDota API (recentMatches).
+        Основная база пополняется автоматически каждые 5 минут.<br>
+        Данные содержат только базовую информацию (K/D/A, длительность, сторона, мода).
+        GPM, XPM, last_hits, RoTL не собраны — нужны детали матча.
+    </div>
+</div>
+
+{% if fresh_matches %}
+<div class="dota-section">
+    <div class="dota-section-title">📋 Все матчи ({{ fresh_matches|length }})</div>
+    <table class="dota-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Match ID</th>
+                <th>Герой</th>
+                <th class="center">Результат</th>
+                <th class="num">K</th>
+                <th class="num">D</th>
+                <th class="num">A</th>
+                <th class="num">KDA</th>
+                <th>Длительность</th>
+                <th>Сторона</th>
+                <th>Мода</th>
+                <th>Время</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in fresh_matches %}
+            {% set mslug = hero_slug(m.hero) %}
+            <tr>
+                <td class="muted">{{ loop.index }}</td>
+                <td class="mono fs-xs muted">
+                    <a href="/match/{{ m.match_id }}" class="gold">
+                        {{ m.match_id[:8] }}...
+                    </a>
+                </td>
+                <td>
+                    <div class="hero-cell">
+                        <img class="hero-thumb"
+                             src="{{ hero_img_url(m.hero) }}"
+                             alt="{{ m.hero }}"
+                             onerror="this.style.display='none'">
+                        <span>{{ m.hero }}</span>
+                    </div>
+                </td>
+                <td class="center">
+                    {% if m.result == 'win' %}
+                    <span class="result-win">V</span>
+                    {% else %}
+                    <span class="result-loss">X</span>
+                    {% endif %}
+                </td>
+                <td class="num">{{ m.K }}</td>
+                <td class="num">{{ m.D }}</td>
+                <td class="num">{{ m.A }}</td>
+                <td class="num">
+                    {% set _kda = (m.K + m.A) / (m.D if m.D > 0 else 1) %}
+                    {{ "%.1f"|format(_kda) }}
+                </td>
+                <td class="mono">{{ m.duration }}</td>
+                <td class="center fs-sm">{{ m.side }}</td>
+                <td class="muted fs-sm">{{ game_mode_name(m.game_mode) }}</td>
+                <td class="muted fs-xs">{{ m.time_ago }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="dota-section">
+    <div class="empty-state">
+        <div class="icon">📭</div>
+        <p>Свежие матчи не загружены. Автообновление подтянет их само каждые 5 минут, пока сервер запущен.</p>
+        <p class="fs-xs mt-sm">После импорта откройте <a href="/">дашборд</a> для просмотра обновлённой статистики.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}DOTA_MASTER — {{ hero }}{% endblock %}
+
+{% block content %}
+<a href="/" class="back-btn">← Дашборд</a>
+
+<!-- Герой с портретом -->
+{% set slug = hero_slug(hero) %}
+<div class="hero-large">
+    <img class="hero-portrait-large"
+         src="{{ hero_img_url(hero) }}"
+         alt="{{ hero }}"
+         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>👾</text></svg>'">
+    <div class="hero-info">
+        <h1>{{ hero }}</h1>
+        <div class="hero-meta">
+            {% if stats.games > 0 %}
+            {{ stats.games }} игр · {{ stats.wins }}W / {{ stats.losses }}L · WR {{ "%.1f"|format(stats.win_rate) }}%
+            {% else %}
+            Недостаточно данных
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Статистика -->
+{% if stats.games > 0 %}
+<div class="stats-grid">
+    <div class="stat-card green">
+        <div class="stat-label">Побед</div>
+        <div class="stat-value">{{ stats.wins }}</div>
+        <div class="stat-sub">{{ stats.losses }} поражений</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Win Rate</div>
+        <div class="stat-value">{{ "%.1f"|format(stats.win_rate) }}%</div>
+        <div class="stat-sub">{{ stats.games }} игр</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Средний KDA</div>
+        <div class="stat-value">{{ "%.1f"|format(stats.avg_kd) }}</div>
+        <div class="stat-sub">K+A / D</div>
+    </div>
+    {% if stats.avg_gpm > 0 %}
+    <div class="stat-card">
+        <div class="stat-label">GPM</div>
+        <div class="stat-value">{{ "%.0f"|format(stats.avg_gpm) }}</div>
+        <div class="stat-sub">звёзд в минуту</div>
+    </div>
+    {% endif %}
+    {% if stats.avg_xpm > 0 %}
+    <div class="stat-card">
+        <div class="stat-label">XPM</div>
+        <div class="stat-value">{{ "%.0f"|format(stats.avg_xpm) }}</div>
+        <div class="stat-sub">опыт в минуту</div>
+    </div>
+    {% endif %}
+    {% if stats.avg_last_hits > 0 %}
+    <div class="stat-card">
+        <div class="stat-label">Last Hits</div>
+        <div class="stat-value">{{ "%.0f"|format(stats.avg_last_hits) }}</div>
+        <div class="stat-sub">в среднем</div>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+<div class="dota-section">
+    <div class="empty-state empty-state-sm">
+        <div class="icon">📊</div>
+        <p>Недостаточно данных для {{ hero }} (нуно минимум 3 игры).</p>
+        <p class="fs-sm mt-sm">
+            Добавьте игры через CLI или импортируйте свежие матчи.
+        </p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Факторы победы/проигрыша (если есть в отчёте) -->
+{% if report and '## Что отличает победы от поражений' in report %}
+<div class="dota-section">
+    <div class="dota-section-title">📊 Что отличает победы от поражений</div>
+    <table class="factor-table">
+        <thead>
+            <tr>
+                <th>Показатель</th>
+                <th>Разница (win − loss)</th>
+                <th>Интерпретация</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in report.split('\n') %}
+            {% if line.startswith('| kills |') %}
+            <tr class="hidden">{{ line }}</tr>
+            {% endif %}
+            {% if line.startswith('| kills |') %}
+            <tr>
+                <td><strong>Kills</strong></td>
+                <td class="{% if 'хуже' in line %}factor-neg{% elif 'лучше' in line %}factor-pos{% else %}factor-neu{% endif %}">
+                    {{ line.split('|')[2].strip() }}
+                </td>
+                <td class="muted fs-sm">
+                    {% if 'хуже' in line %}В победах меньше убийств — фокус на ассистах{% elif 'лучше' in line %}В победах больше убийств{% else %}Без разницы{% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% if line.startswith('| deaths |') %}
+            <tr>
+                <td><strong>Deaths</strong></td>
+                <td class="{% if 'хуже' in line %}factor-neg{% elif 'лучше' in line %}factor-pos{% else %}factor-neu{% endif %}">
+                    {{ line.split('|')[2].strip() }}
+                </td>
+                <td class="muted fs-sm">
+                    {% if 'хуже' in line %}В победах меньше смертей — позиционирование важно{% elif 'лучше' in line %}В победах больше смертей — агрессивный стиль{% else %}Без разницы{% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% if line.startswith('| assists |') %}
+            <tr>
+                <td><strong>Assists</strong></td>
+                <td class="{% if 'хуже' in line %}factor-neg{% elif 'лучше' in line %}factor-pos{% else %}factor-neu{% endif %}">
+                    {{ line.split('|')[2].strip() }}
+                </td>
+                <td class="muted fs-sm">
+                    {% if 'хуже' in line %}В победах меньше ассистов{% elif 'лучше' in line %}В победах больше ассистов — помощь команде{% else %}Без разницы{% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% if line.startswith('| rotl |') %}
+            <tr>
+                <td><strong>RoTL</strong></td>
+                <td class="factor-neu">{{ line.split('|')[2].strip() }}</td>
+                <td class="muted fs-sm">Урон по линии (нужно собирать)</td>
+            </tr>
+            {% endif %}
+            {% if line.startswith('| gpm |') %}
+            <tr>
+                <td><strong>GPM</strong></td>
+                <td class="factor-neu">{{ line.split('|')[2].strip() }}</td>
+                <td class="muted fs-sm">Золото в минуту (нужно собирать)</td>
+            </tr>
+            {% endif %}
+            {% if line.startswith('| xpm |') %}
+            <tr>
+                <td><strong>XPM</strong></td>
+                <td class="factor-neu">{{ line.split('|')[2].strip() }}</td>
+                <td class="muted fs-sm">Опыт в минуту (нужно собирать)</td>
+            </tr>
+            {% endif %}
+            {% if line.startswith('| last_hits |') %}
+            <tr>
+                <td><strong>Last Hits</strong></td>
+                <td class="factor-neu">{{ line.split('|')[2].strip() }}</td>
+                <td class="muted fs-sm">Последние удары (нужно собирать)</td>
+            </tr>
+            {% endif %}
+            {% if line.startswith('| duration |') %}
+            <tr>
+                <td><strong>Duration</strong></td>
+                <td class="factor-neu">{{ line.split('|')[2].strip() }}</td>
+                <td class="muted fs-sm">Длительность игры</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    <p class="muted fs-xs mt-sm">
+        * Разница рассчитана как среднее значение в победах минус среднее в поражениях.
+    </p>
+</div>
+{% endif %}
+
+<!-- Рекомендации -->
+{% if report and '## Выводы' in report %}
+<div class="dota-section">
+    <div class="dota-section-title">💡 Рекомендации для улучшения</div>
+    <ul class="advice-list">
+        {% for line in report.split('\n') %}
+        {% if line.startswith('- ') %}
+        <li>{{ line[2:] }}</li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+    {% if not report.split('\n')|reject('equalto', '')|list|length < 2 %}
+    <div class="note-box">
+        Нет чётких различий между победных и проигрышных играх. Нужно больше данных или фокус на таких факторах, как team fight и поддержка.
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Список игр -->
+{% if games %}
+<div class="dota-section">
+    <div class="dota-section-title">📋 Все игры на {{ hero }} ({{ games|length }})</div>
+    <table class="dota-table">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th class="center">Результат</th>
+                <th class="num">K</th>
+                <th class="num">D</th>
+                <th class="num">A</th>
+                <th class="num">KDA</th>
+                <th>Мода</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in games %}
+            <tr class="{% if g.match_id %}match-row-clickable{% endif %}"
+                {% if g.match_id %}onclick="window.location.href='/match/{{ g.match_id }}'"{% endif %}>
+                <td class="muted fs-sm">
+                    {{ g.date[:10] if g.date else '—' }}
+                </td>
+                <td class="center">
+                    <img src="{{ hero_img_url(g.hero) }}" alt="{{ g.hero }}" class="hero-thumb-sm"
+                         onerror="this.style.display='none'">
+                    {% if g.result == 'win' %}
+                    <span class="result-win">V</span>
+                    {% else %}
+                    <span class="result-loss">X</span>
+                    {% endif %}
+                </td>
+                <td class="num">{{ g.kills }}</td>
+                <td class="num">{{ g.deaths }}</td>
+                <td class="num">{{ g.assists }}</td>
+                <td class="num">
+                    {% set _kda = (g.kills + g.assists) / (g.deaths if g.deaths > 0 else 1) %}
+                    {{ "%.1f"|format(_kda) }}
+                </td>
+                <td class="fs-sm muted">
+                    {{ game_mode_name(g.game_mode) or '—' }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

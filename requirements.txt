@@ -1,0 +1,8 @@
+# DOTA_MASTER — зависимости
+# Установка: pip install -r requirements.txt  (или: uv pip install -r requirements.txt)
+# Python 3.10+
+
+Flask>=3.0
+PyYAML>=6.0  # опционально, для будущего config.yaml
+pytest>=8.0  # только для запуска тестов (python -m pytest tests/ -q)
+markdown>=3.5  # для рендеринга Markdown в отчётах

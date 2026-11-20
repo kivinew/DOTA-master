@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}DOTA_MASTER — Сравнение героев{% endblock %}
+
+{% block content %}
+<a href="/" class="back-btn">← Дашборд</a>
+<h1 class="page-title">👹 Сравнение героев</h1>
+<p class="page-subtitle">Статистика по всем героям</p>
+
+<div class="dota-section">
+    <table class="dota-table">
+        <thead>
+            <tr>
+                <th>Герой</th>
+                <th class="num">Игры</th>
+                <th class="num">WR</th>
+                <th class="num">KDA</th>
+                <th class="num">GPM</th>
+                <th class="num">XPM</th>
+                <th class="num">LH/м</th>
+                <th class="num">DPM</th>
+                <th class="num">Башни</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for h in stats.by_hero %}
+            <tr>
+                <td><a href="/hero/{{ h.hero }}" class="gold">{{ h.hero }}</a></td>
+                <td class="num">{{ h.games }}</td>
+                <td class="num {% if h.win_rate >= 50 %}result-win{% else %}result-loss{% endif %}">{{ h.win_rate }}%</td>
+                <td class="num">{{ h.avg_kd }}</td>
+                <td class="num">{{ h.avg_gpm }}</td>
+                <td class="num">{{ h.avg_xpm }}</td>
+                <td class="num">{{ h.avg_lh }}</td>
+                <td class="num">{{ h.avg_dpm }}</td>
+                <td class="num">{{ h.avg_tower_damage }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

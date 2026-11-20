@@ -1,0 +1,126 @@
+﻿{% set hero = hero if hero is defined else 'Pugna' %}<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DOTA_MASTER — Статистика игр{% endblock %}</title>
+        <meta name="theme-color" content="#faf9f7" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#0d0d12" media="(prefers-color-scheme: dark)">
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%94%3C/text%3E%3C/svg%3E">
+        <!-- Light theme CSS -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/dota-light-theme.css', v='6') }}">
+        <!-- Dark theme CSS (toggled via JS; media starts matching OS preference) -->
+        <link id="dark-theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/dota.css', v='8') }}" media="(prefers-color-scheme: dark)">
+        {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="dota-header">
+        <a href="/" class="dota-logo">
+            <div class="dota-logo-icon">⚔️</div>
+            <div>
+                <div class="dota-logo-text">DOTA_MASTER</div>
+                <div class="dota-logo-sub">Статистика игр в DOTA 2</div>
+            </div>
+        </a>
+        <nav class="nav-bar">
+            {% set path = request.path %}
+            <a href="/" class="nav-link{% if path == '/' %} active{% endif %}">📊 Дашборд</a>
+            <a href="/games" class="nav-link{% if path.startswith('/games') %} active{% endif %}">📋 Игры</a>
+            <a href="/fresh" class="nav-link{% if path.startswith('/fresh') %} active{% endif %}">🔄 Свежие</a>
+            <a href="/errors" class="nav-link{% if path.startswith('/errors') %} active{% endif %}">⚠️ Ошибки</a>
+            <a href="/macro" class="nav-link{% if path.startswith('/macro') %} active{% endif %}">📈 Анализ</a>
+            <a href="/report" class="nav-link{% if path.startswith('/report') %} active{% endif %}">📋 Отчёт</a>
+            <a href="/heroes" class="nav-link{% if path.startswith('/heroes') %} active{% endif %}">👹 Герои</a>
+            <a href="/hero/{{ hero }}" class="nav-link{% if path.startswith('/hero') %} active{% endif %}">👹 {{ hero }}</a>
+            <a href="/api" class="nav-link{% if path.startswith('/api') %} active{% endif %}">📖 API</a>
+        </nav>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему" title="Переключить тему (Ctrl+Shift+T)">
+            <span class="theme-icon-sun" aria-hidden="true">☀️</span>
+            <span class="theme-icon-moon" aria-hidden="true">🌙</span>
+        </button>
+    </header>
+
+    <main class="container">
+{% block content %}{% endblock %}
+        <div class="dota-footer">
+            DOTA_MASTER v1.0 · Данные из
+            <a href="https://www.opendota.com/players/41099157/matches" target="_blank" rel="noopener">OpenDota</a>
+            · SteamID64: 76561198001364885 ·
+            <a href="https://steamcommunity.com/id/kivinew/" target="_blank" rel="noopener">kivinew</a>
+            · <a href="/api">API</a>
+        </div>
+    </main>
+
+    <script>
+        (function() {
+            'use strict';
+            
+            const THEME_KEY = 'dota_master_theme';
+            const toggleBtn = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            const darkCss = document.getElementById('dark-theme-css');
+            
+            function setDarkCss(enabled) {
+                if (darkCss) {
+                    darkCss.media = enabled ? 'all' : 'not all';
+                }
+            }
+            
+            function updateToggleIcon() {
+                const isDark = html.getAttribute('data-theme') === 'dark';
+                const sun = toggleBtn.querySelector('.theme-icon-sun');
+                const moon = toggleBtn.querySelector('.theme-icon-moon');
+                if (sun && moon) {
+                    sun.style.display = isDark ? 'inline' : 'none';
+                    moon.style.display = isDark ? 'none' : 'inline';
+                }
+            }
+            
+            function applyTheme(theme) {
+                html.setAttribute('data-theme', theme);
+                setDarkCss(theme === 'dark');
+                updateToggleIcon();
+            }
+            
+            function initTheme() {
+                const saved = localStorage.getItem(THEME_KEY);
+                if (saved) {
+                    applyTheme(saved);
+                } else {
+                    // No saved preference — respect OS preference
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    applyTheme(prefersDark ? 'dark' : 'light');
+                }
+            }
+            
+            function toggleTheme() {
+                const current = html.getAttribute('data-theme');
+                const nextTheme = current === 'light' ? 'dark' : 'light';
+                localStorage.setItem(THEME_KEY, nextTheme);
+                applyTheme(nextTheme);
+                // Force reflow to ensure theme changes are applied
+                void html.offsetWidth;
+            }
+            
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', toggleTheme);
+            }
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+                    e.preventDefault();
+                    toggleTheme();
+                }
+            });
+            
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+            
+            initTheme();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}DOTA_MASTER — Анализ матчей{% endblock %}
+
+{% block content %}
+<a href="/" class="back-btn">← Дашборд</a>
+<h1 class="page-title">📈 Анализ матчей</h1>
+<p class="page-subtitle">Макро-анализ: сравнение с эталоном ранга Legend, частые ошибки, рекомендации</p>
+
+{% if analysis.matches_analyzed == 0 %}
+<div class="dota-section">
+    <div class="empty-state">
+        <div class="icon">📭</div>
+        <p>Нет данных для анализа.</p>
+    </div>
+</div>
+{% else %}
+
+<!-- Общая статистика -->
+<div class="dota-section">
+    <div class="dota-section-title">📊 Сводка ({{ analysis.matches_analyzed }} матчей)</div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Винрейт</div>
+            <div class="stat-value {% if analysis.win_rate >= 50 %}result-win{% else %}result-loss{% endif %}">{{ analysis.win_rate }}%</div>
+            <div class="stat-sub">за последние игры</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Средний GPM</div>
+            <div class="stat-value">{{ analysis.avg_gpm }}</div>
+            <div class="stat-sub">цель: 600+</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Средний XPM</div>
+            <div class="stat-value">{{ analysis.avg_xpm }}</div>
+            <div class="stat-sub">цель: 700+</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Средний KDA</div>
+            <div class="stat-value">{{ analysis.avg_kda }}</div>
+            <div class="stat-sub">цель: 3.5+</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Смертей за игру</div>
+            <div class="stat-value {% if analysis.avg_deaths > 7 %}result-loss{% endif %}">{{ analysis.avg_deaths }}</div>
+            <div class="stat-sub">цель: ≤4</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Урон по башням</div>
+            <div class="stat-value">{{ analysis.avg_tower_damage|int }}</div>
+            <div class="stat-sub">цель: 3000+</div>
+        </div>
+    </div>
+</div>
+
+<!-- Частые ошибки -->
+{% if analysis.top_errors %}
+<div class="dota-section">
+    <div class="dota-section-title">⚠️ Частые проблемы</div>
+    <div class="error-list">
+        {% for err, count in analysis.top_errors %}
+        <div class="error-item">
+            <span class="error-name">
+            {% if err == 'gpm' %}📉 Низкий GPM
+            {% elif err == 'xpm' %}📉 Низкий XPM
+            {% elif err == 'lhpm' %}⚒️ Мало ластхитов
+            {% elif err == 'deaths' %}💀 Много смертей
+            {% elif err == 'td' %}🏰 Мало урона по башням
+            {% elif err == 'dpm' %}⚔️ Мало урона по героям
+            {% elif err == 'kda' %}📊 Низкий KDA
+            {% else %}{{ err }}
+            {% endif %}
+            </span>
+            <span class="error-count">{{ count }} из {{ analysis.matches_analyzed }} матчей</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Рекомендации -->
+<div class="dota-section">
+    <div class="dota-section-title">💡 Рекомендации</div>
+    <div class="tip-box">
+        <ul>
+        {% for tip in analysis.general_tips %}
+            <li>{{ tip }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Таблица матчей -->
+<div class="dota-section">
+    <div class="dota-section-title">📋 Последние матчи <a href="/report" class="fs-xs gold" style="margin-left: 8px;">Полный отчёт →</a></div>
+    <table class="dota-table">
+        <thead>
+            <tr>
+                <th>Герой</th>
+                <th class="center">Результат</th>
+                <th class="num">KDA</th>
+                <th class="num">GPM</th>
+                <th class="num">LH/m</th>
+                <th class="num">DPM</th>
+                <th class="num">Башни</th>
+                <th>Проблемы</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for m in analysis.matches %}
+            <tr>
+                <td>
+                    <div class="hero-cell">
+                        <img class="hero-thumb-sm"
+                             src="{{ hero_img_url(m.hero_name) }}"
+                             alt="{{ m.hero_name }}"
+                             onerror="this.style.display='none'">
+                        <span>{{ m.hero_name }}</span>
+                    </div>
+                </td>
+                <td class="center">
+                    {% if m.result == 'win' %}
+                    <span class="result-win">V</span>
+                    {% else %}
+                    <span class="result-loss">X</span>
+                    {% endif %}
+                </td>
+                <td class="num {% if m.kda >= 3.5 %}result-win{% elif m.kda < 2 %}result-loss{% endif %}">{{ m.kda }}</td>
+                <td class="num">{{ m.gpm }}</td>
+                <td class="num {% if m.lhpm < 4 %}result-loss{% endif %}">{{ m.lhpm }}</td>
+                <td class="num">{{ m.dpm }}</td>
+                <td class="num {% if m.tower_damage < 1000 %}result-loss{% endif %}">{{ m.tower_damage }}</td>
+                <td class="fs-xs">
+                {% for key, val in m.scores.items() %}
+                    {% if val in ('low','bad','warn') %}
+                    <span class="badge {% if val == 'bad' %}badge-bad{% else %}badge-warn{% endif %}">
+                    {% if key == 'gpm' %}GPM
+                    {% elif key == 'xpm' %}XPM
+                    {% elif key == 'lhpm' %}LH
+                    {% elif key == 'deaths' %}DTH
+                    {% elif key == 'td' %}TWR
+                    {% elif key == 'dpm' %}DPM
+                    {% elif key == 'kda' %}KDA
+                    {% else %}{{ key }}
+                    {% endif %}
+                    </span>
+                    {% endif %}
+                {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endif %}
+{% endblock %}

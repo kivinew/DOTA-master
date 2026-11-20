@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}DOTA_MASTER — API документация{% endblock %}
+
+{% block content %}
+        <a href="/" class="back-btn">← Дашборд</a>
+        <h1 class="page-title">📖 API документация</h1>
+        <p class="page-subtitle">DOTA_MASTER REST API — программный доступ к статистике</p>
+
+        <div class="dota-section">
+            <div class="dota-section-title">🌐 Базовый URL</div>
+            <div class="code-block">
+                <span class="cmd">http://localhost:9999/api</span>
+            </div>
+            <p class="muted fs-sm mt-sm">
+                Все эндпоинты возвращают JSON. Ответы имеют формат <code>{"status": "success", ...}</code> или <code>{"status": "error", "message": "..."}</code>.
+            </p>
+        </div>
+
+        <div class="dota-section">
+            <div class="dota-section-title">📡 Эндпоинты</div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="endpoint-path">/api/games</span>
+                </div>
+                <div class="endpoint-desc">Все игры (последние 50), отсортированные по дате</div>
+                <div class="endpoint-example">
+{
+  <span class="key">"status"</span>: <span class="string">"success"</span>,
+  <span class="key">"games"</span>: [
+    {
+      <span class="key">"date"</span>: <span class="string">"2026-09-13T22:39:17"</span>,
+      <span class="key">"hero"</span>: <span class="string">"Pugna"</span>,
+      <span class="key">"role"</span>: <span class="string">"offlane"</span>,
+      <span class="key">"result"</span>: <span class="string">"win"</span>,
+      <span class="key">"kills"</span>: <span class="number">12</span>,
+      <span class="key">"deaths"</span>: <span class="number">5</span>,
+      <span class="key">"assists"</span>: <span class="number">4</span>,
+      <span class="key">"game_mode"</span>: <span class="string">"Turbo Archon [4]"</span>
+    }
+  ],
+  <span class="key">"total"</span>: <span class="number">43</span>
+}
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="endpoint-path">/api/games/<span class="cyan">&lt;hero&gt;</span></span>
+                </div>
+                <div class="endpoint-desc">Игры конкретного героя</div>
+                <div class="endpoint-example">
+GET /api/games/Pugna →
+{
+  <span class="key">"status"</span>: <span class="string">"success"</span>,
+  <span class="key">"hero"</span>: <span class="string">"Pugna"</span>,
+  <span class="key">"games"</span>: [...],
+  <span class="key">"total"</span>: <span class="number">36</span>
+}
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="endpoint-path">/api/stats</span>
+                </div>
+                <div class="endpoint-desc">Общая статистика</div>
+                <div class="endpoint-example">
+GET /api/stats →
+{
+  <span class="key">"stats"</span>: {
+    <span class="key">"total_games"</span>: <span class="number">43</span>,
+    <span class="key">"total_wins"</span>: <span class="number">23</span>,
+    <span class="key">"total_losses"</span>: <span class="number">20</span>,
+    <span class="key">"global_win_rate"</span>: <span class="number">53.5</span>,
+    <span class="key">"avg_kd"</span>: <span class="number">10.28</span>,
+    <span class="key">"by_hero"</span>: [...]
+  }
+}
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="endpoint-path">/api/hero/<span class="cyan">&lt;hero&gt;</span>/stats</span>
+                </div>
+                <div class="endpoint-desc">Статистика по герою</div>
+                <div class="endpoint-example">
+GET /api/hero/Pugna/stats →
+{
+  <span class="key">"stats"</span>: {
+    <span class="key">"hero"</span>: <span class="string">"Pugna"</span>,
+    <span class="key">"games"</span>: <span class="number">36</span>,
+    <span class="key">"wins"</span>: <span class="number">22</span>,
+    <span class="key">"losses"</span>: <span class="number">14</span>,
+    <span class="key">"win_rate"</span>: <span class="number">61.1</span>,
+    <span class="key">"avg_kd"</span>: <span class="number">11.67</span>
+  }
+}
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="endpoint-path">/api/hero/<span class="cyan">&lt;hero&gt;</span>/analysis</span>
+                </div>
+                <div class="endpoint-desc">Анализ стратегии (что отличает победы от поражений)</div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="endpoint-path">/api/errors</span>
+                </div>
+                <div class="endpoint-desc">Игры с критическими ошибками</div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method-badge method-get">GET</span>
+                    <span class="endpoint-path">/api/fresh_matches</span>
+                </div>
+                <div class="endpoint-desc">Сырые свежие матчи из OpenDota (до обработки)</div>
+            </div>
+        </div>
+
+        <div class="dota-section">
+            <div class="dota-section-title">📋 Параметры</div>
+            <div class="code-block">
+                <span class="cmd">&lt;hero&gt;</span> — название героя (латиницей)<br>
+                Примеры: Pugna, Naga Siren, Weaver, Anti-Mage, Lich
+            </div>
+        </div>
+
+        <div class="dota-section">
+            <div class="dota-section-title">🚀 Быстрый запуск</div>
+            <div class="code-block">
+                <span class="cmd">cd E:\DOWNLOADS\CREATIVE\PYTHON\GitHub\DOTA_MASTER</span><br>
+                <span class="cmd">python app.py</span><br><br>
+                Откройте: <span class="cmd">http://localhost:9999</span><br>
+                В сети: <span class="cmd">http://&lt;ваш-ip&gt;:9999</span>
+            </div>
+            <p class="muted fs-sm mt-sm">
+                Для автоматического запуска используйте <code class="inline-code">start_web.bat</code>
+            </p>
+        </div>
+{% endblock %}
