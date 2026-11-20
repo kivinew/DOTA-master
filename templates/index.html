@@ -3,8 +3,23 @@
 {% block title %}DOTA_MASTER — Статистика игр{% endblock %}
 
 {% block content %}
-<h1 class="page-title">📊 Дашборд</h1>
-<p class="page-subtitle">Общая статистика игр в DOTA 2 из OpenDota</p>
+<section class="dashboard-hero" aria-labelledby="dashboard-title">
+    <div class="dashboard-hero-copy">
+        <span class="eyebrow"><span class="live-dot"></span> ЛИЧНАЯ АНАЛИТИКА · OPEN DOTA</span>
+        <h1 id="dashboard-title">Каждый матч<br><em>рассказывает историю.</em></h1>
+        <p>Разбирай победы, находи точки роста и возвращайся на поле боя сильнее.</p>
+        <div class="dashboard-actions">
+            <a href="/games" class="btn btn-primary">⚔ Матчи и история <span aria-hidden="true">→</span></a>
+            <a href="/report" class="btn btn-ghost">✦ Полный анализ</a>
+        </div>
+    </div>
+    <div class="dashboard-hero-mark" aria-hidden="true"><span>✦</span></div>
+    <div class="dashboard-hero-caption"><span>STRATEGY · PERFORMANCE · VICTORY</span><span>01 / OVERVIEW</span></div>
+</section>
+<div class="dashboard-section-heading">
+    <div><span class="eyebrow">ТВОИ ПОКАЗАТЕЛИ</span><h2>Обзор статистики</h2></div>
+    <a class="text-link" href="/games">Все матчи <span aria-hidden="true">↗</span></a>
+</div>
 <!-- Статистика -->
 {% if stats and stats.total_games > 0 %}
 <div class="stats-row">

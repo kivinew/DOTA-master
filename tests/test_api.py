@@ -5,10 +5,40 @@
 к OpenDota здесь не выполняются.
 """
 
+import json
+
+import pytest
+
 import app as webapp
+from analysis import stats_engine
+
+
+@pytest.fixture(autouse=True)
+def seeded_game_history(tmp_path, monkeypatch):
+    """Keep API tests deterministic and independent of ignored local game data."""
+    games_dir = tmp_path / "games"
+    games_dir.mkdir()
+    records = []
+    for index in range(7):
+        records.append({
+            "match_id": 900000 + index,
+            "date": f"2026-11-{20 - index:02d}T12:30:00",
+            "hero": "Pugna" if index < 5 else "Axe",
+            "result": "win" if index % 2 == 0 else "loss",
+            "kills": 6 + index, "deaths": 2 + index % 3, "assists": 9,
+            "role": "support", "game_mode": 1, "gpm": 420 + index,
+            "xpm": 510 + index, "last_hits": 80 + index, "rotl": 0,
+            "notes": "",
+        })
+    (games_dir / "games.json").write_text(json.dumps(records), encoding="utf-8")
+    monkeypatch.setattr(stats_engine, "GAMES_DIR", str(games_dir))
+    stats_engine._invalidate_cache()
+    yield
+    stats_engine._invalidate_cache()
 
 
 def _client():
+
     return webapp.app.test_client()
 
 
@@ -34,6 +64,12 @@ def test_api_games_caps_per_page():
     assert d["per_page"] == 200
 
 
+def test_api_date_to_includes_matches_from_that_calendar_day():
+    d = _client().get("/api/games?hero=Pugna&date_to=2026-11-20&per_page=200").get_json()
+    assert d["total"] == 5
+    assert any(game["date"].startswith("2026-11-20") for game in d["games"])
+
+
 def test_api_404_is_json():
     r = _client().get("/api/nope")
     assert r.status_code == 404
@@ -56,6 +92,12 @@ def test_api_hero_stats():
     assert d["hero"] == "Pugna"
     assert "stats" in d
     assert d["stats"]["games"] > 0
+
+
+def test_api_validates_against_catalog_not_player_history():
+    r = _client().get("/api/hero/Invoker/stats")
+    assert r.status_code == 200
+    assert r.get_json()["stats"]["games"] == 0
 
 
 def test_api_hero_analysis():
