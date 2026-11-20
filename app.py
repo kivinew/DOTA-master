@@ -225,9 +225,21 @@ def sanitize_string(value: str, max_len: int = 100) -> str:
     return value.strip()[:max_len]
 
 def validate_hero_name(hero: str) -> bool:
-    """Validate hero name against known list."""
-    all_heroes = get_all_heroes()
-    return hero in all_heroes
+    """Validate a hero against the OpenDota hero catalog, not only played heroes.
+
+    API requests for an otherwise valid hero should not fail just because the
+    local match history is empty or the player has never picked that hero.
+    """
+    if not isinstance(hero, str):
+        return False
+    try:
+        catalog_path = os.path.join(os.path.dirname(__file__), "data", "heroes_cache.json")
+        with open(catalog_path, "r", encoding="utf-8") as catalog_file:
+            catalog = json.load(catalog_file)
+        known_heroes = {entry.get("localized_name") for entry in catalog if isinstance(entry, dict)}
+        return hero.strip() in known_heroes
+    except (OSError, ValueError, TypeError):
+        return hero.strip() in get_all_heroes()
 
 def validate_match_id(match_id) -> bool:
     """Validate match_id is a positive integer."""
@@ -284,10 +296,12 @@ def get_games_data(page: int = 1, per_page: int = 50,
         games = [g for g in games if g.get("result") == result_filter]
 
     if date_from:
-        games = [g for g in games if g.get("date", "") >= date_from]
+        games = [g for g in games if str(g.get("date", ""))[:10] >= date_from]
 
     if date_to:
-        games = [g for g in games if g.get("date", "") <= date_to]
+        # Compare date-only values so matches played later on the end date are
+        # included even when the stored timestamp contains a time component.
+        games = [g for g in games if str(g.get("date", ""))[:10] <= date_to]
 
     if min_kda is not None:
         games = [g for g in games if (g.get("kills", 0) + g.get("assists", 0)) / max(g.get("deaths", 1), 1) >= min_kda]

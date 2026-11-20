@@ -1,5 +1,5 @@
-﻿{% set hero = hero if hero is defined else 'Pugna' %}<!DOCTYPE html>
-<html lang="ru">
+{% set hero = hero if hero is defined else 'Pugna' %}<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +9,9 @@
         <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%94%3C/text%3E%3C/svg%3E">
         <!-- Light theme CSS -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/dota-light-theme.css', v='6') }}">
-        <!-- Dark theme CSS (toggled via JS; media starts matching OS preference) -->
-        <link id="dark-theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/dota.css', v='8') }}" media="(prefers-color-scheme: dark)">
+        <!-- Dark fantasy palette is the default; the toggle can switch to parchment light. -->
+        <link id="dark-theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/dota.css', v='9') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/dota-modern.css', v='1') }}">
         {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -82,23 +83,25 @@
                 updateToggleIcon();
             }
             
-            function initTheme() {
-                const saved = localStorage.getItem(THEME_KEY);
-                if (saved) {
-                    applyTheme(saved);
-                } else {
-                    // No saved preference — respect OS preference
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    applyTheme(prefersDark ? 'dark' : 'light');
+            function getSavedTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    return saved === 'light' || saved === 'dark' ? saved : null;
+                } catch (_) {
+                    return null;
                 }
+            }
+
+            function initTheme() {
+                // Dota's dark, cinematic palette is the intentional first-visit default.
+                applyTheme(getSavedTheme() || 'dark');
             }
             
             function toggleTheme() {
                 const current = html.getAttribute('data-theme');
                 const nextTheme = current === 'light' ? 'dark' : 'light';
-                localStorage.setItem(THEME_KEY, nextTheme);
+                try { localStorage.setItem(THEME_KEY, nextTheme); } catch (_) { /* private mode */ }
                 applyTheme(nextTheme);
-                // Force reflow to ensure theme changes are applied
                 void html.offsetWidth;
             }
             
@@ -113,11 +116,12 @@
                 }
             });
             
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-                if (!localStorage.getItem(THEME_KEY)) {
-                    applyTheme(e.matches ? 'dark' : 'light');
-                }
-            });
+            const colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
+            if (colorScheme.addEventListener) {
+                colorScheme.addEventListener('change', function() {
+                    if (!getSavedTheme()) applyTheme('dark');
+                });
+            }
             
             initTheme();
         })();
