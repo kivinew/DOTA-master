@@ -58,6 +58,11 @@ if errorlevel 1 (
 echo after push section
 echo ==================================================
 echo Sync complete.
+echo ==================================================
+echo.
+chcp 65001 >nul
+mode con: cols=120 lines=30 >nul
+echo after chcp/mode
 
 echo Starting DOTA_MASTER...
 echo Port: 9999

@@ -22,7 +22,7 @@ if errorlevel 1 (
     git add -A >nul 2>&1
     git commit -m "Auto-sync: local changes from %COMPUTERNAME% at %DATE% %TIME%" >nul 2>&1
     if errorlevel 1 (
-        echo Warning: commit failed
+        echo Warning: commit failed (maybe nothing to commit)
     ) else (
         echo Local commit created.
     )
@@ -48,13 +48,21 @@ if errorlevel 1 (
     echo Pushing local commits to remote...
     git push origin master >nul 2>&1
     if errorlevel 1 (
-        echo Warning: push failed
+        echo Warning: push failed (maybe authentication needed)
     ) else (
         echo Push complete.
     )
 )
 echo ==================================================
 echo Sync complete.
+
+echo Starting DOTA_MASTER...
+echo Port: 9999
+"%PYTHON%" -u app.py
+
+echo.
+echo Server stopped. Press any key to exit.
+pause >nul
 
 echo Starting DOTA_MASTER...
 echo Port: 9999
