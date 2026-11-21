@@ -22,11 +22,12 @@ if errorlevel 1 (
     git add -A >nul 2>&1
     git commit -m "Auto-sync: local changes from %COMPUTERNAME% at %DATE% %TIME%" >nul 2>&1
     if errorlevel 1 (
-        echo Warning: commit failed (maybe nothing to commit)
+        echo Warning: commit failed
     ) else (
         echo Local commit created.
     )
 )
+echo after commit section
 echo Fetching remote...
 git fetch origin >nul 2>&1
 git rev-list HEAD..origin/master --count | findstr /r "^[1-9]" >nul
@@ -41,6 +42,7 @@ if errorlevel 1 (
         echo Pull complete.
     )
 )
+echo after pull section
 git rev-list origin/master..HEAD --count | findstr /r "^[1-9]" >nul
 if errorlevel 1 (
     echo No local commits to push.
@@ -48,14 +50,19 @@ if errorlevel 1 (
     echo Pushing local commits to remote...
     git push origin master >nul 2>&1
     if errorlevel 1 (
-        echo Warning: push failed (maybe authentication needed)
+        echo Warning: push failed
     ) else (
         echo Push complete.
     )
 )
+echo after push section
 echo ==================================================
 echo Sync complete.
-echo ==================================================
+
+echo Starting DOTA_MASTER...
+echo Port: 9999
+"%PYTHON%" -u app.py
+
 echo.
-chcp 65001 >nul
-mode con: cols=120 lines=30 >nul
+echo Server stopped. Press any key to exit.
+pause >nul
