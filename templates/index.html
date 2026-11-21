@@ -134,9 +134,19 @@
 </div>
 {% else %}
 <div class="dota-section">
-    <div class="empty-state">
-        <div class="icon">📊</div>
-        <p>Статистики пока нет. Автообновление подтянет игры с OpenDota само, пока сервер запущен.</p>
+    <div class="tip-box warn">
+        📊 <strong>В локальной базе пока нет игр.</strong><br>
+        {% if fresh_matches %}
+        Свежие матчи с OpenDota уже загружены ({{ fresh_matches|length }} шт., ниже) — в статистику они попадут после сохранения в
+        <span class="mono">games.json</span> (автообновление делает это каждые 5 минут).
+        {% else %}
+        Автообновление подтянет игры с OpenDota само, пока сервер запущен. Если этого не происходит — проверьте доступ к
+        <span class="mono">api.opendota.com</span>.
+        {% endif %}
+        <div class="mt-sm">
+            <a href="/fresh?refresh=1" class="btn btn-primary">🔄 Загрузить матчи</a>
+            <a href="/games" class="btn">📋 Все игры</a>
+        </div>
     </div>
 </div>
 {% endif %}
