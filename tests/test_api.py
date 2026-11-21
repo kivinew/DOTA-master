@@ -337,6 +337,12 @@ def test_games_page_contains_live_matches_section(monkeypatch):
     assert "Живой ответ OpenDota" in body
     assert "770000001" in body
     assert "/games?refresh=1#live" in body
+
+    # вся строка живого матча кликабельна — как в таблице истории
+    live_table = body.split('id="live"', 1)[1].split("</table>", 1)[0]
+    assert "match-row-clickable" in live_table
+    assert "onclick=\"window.location.href='/match/770000001'\"" in live_table
+    assert 'role="link"' in live_table
     # история из базы тоже на месте
     assert "match-row-clickable" in body
 
