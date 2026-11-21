@@ -24,6 +24,15 @@ for /f "tokens=5" %%a in ('netstat -ano ^| findstr :9999') do (
 )
 timeout /t 1 /nobreak >nul
 
+rem ==================================================
+rem Synchronize with remote repository
+rem ==================================================
+echo Syncing with remote repository...
+git fetch origin >nul 2>&1
+git checkout -- games/.auto_update.pid >nul 2>&1
+git pull --ff-only origin master 2>&1 | findstr /v /c:"Already up to date" /c:"Fast-forward" /c:"create mode" || echo Sync complete.
+echo.
+
 rem Run server in this window
 chcp 65001 >nul
 mode con: cols=120 lines=30 >nul
