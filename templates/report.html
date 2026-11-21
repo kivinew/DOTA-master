@@ -9,12 +9,27 @@
 
 {% if report.error %}
 <div class="dota-section">
-    <div class="empty-state">
-        <div class="icon">📭</div>
-        <p>{{ report.error }}</p>
+    <div class="tip-box warn">
+        ⚠️ <strong>Нет данных для отчёта.</strong> {{ report.error }}<br>
+        OpenDota недоступен, а локальная база пуста. Проверьте доступ к
+        <span class="mono">api.opendota.com</span> и запустите автообновление.
+        <div class="mt-sm">
+            <a href="/fresh?refresh=1" class="btn btn-primary">🔄 Обновить матчи</a>
+            <a href="/report" class="btn">🔄 Повторить</a>
+        </div>
     </div>
 </div>
 {% else %}
+
+{% if report.fallback_reason == 'open_dota_unavailable' %}
+<div class="dota-section">
+    <div class="tip-box warn">
+        ⚠️ <strong>OpenDota сейчас недоступен</strong> — отчёт построен по локальной базе
+        <span class="mono">games.json</span> ({{ report.matches_analyzed }} матчей).
+        <div class="mt-sm"><a href="/report" class="btn">🔄 Повторить запрос к OpenDota</a></div>
+    </div>
+</div>
+{% endif %}
 
 <div class="dota-section">
     <div class="dota-section-title">📊 Сводка ({{ report.matches_analyzed }} матчей)</div>

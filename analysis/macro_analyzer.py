@@ -8,7 +8,7 @@
 import json
 import os
 import statistics
-from datetime import timezone, timedelta
+from datetime import datetime, timezone, timedelta
 from collections import Counter, defaultdict
 from typing import Optional
 
@@ -641,16 +641,100 @@ def empty_macro_analysis() -> dict:
     }
 
 
-def analyze_all_matches(match_ids: list[int] = None, max_matches: int = 20) -> dict:
-    """Быстрый анализ через recentMatches (один запрос)."""
-    raw_matches = get_recent_matches_batch(limit=max_matches) or []
+_LOCAL_DATE_FORMATS = (
+    "%Y-%m-%d %H:%M:%S +07",
+    "%Y-%m-%dT%H:%M:%S",
+    "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%d",
+)
+
+
+def _local_game_to_recent(game: dict) -> Optional[dict]:
+    """Локальная запись games.json → формат recentMatches для analyze_from_recent."""
+    if not isinstance(game, dict):
+        return None
+
+    start_time = None
+    for raw in (game.get("date_full"), game.get("date")):
+        if not raw:
+            continue
+        text = str(raw).strip()
+        for fmt in _LOCAL_DATE_FORMATS:
+            try:
+                dt = datetime.strptime(text, fmt)
+            except ValueError:
+                continue
+            start_time = int(dt.replace(tzinfo=LOCAL_TZ).timestamp())
+            break
+        if start_time:
+            break
+
+    def num(value):
+        try:
+            return float(value or 0)
+        except (TypeError, ValueError):
+            return 0
+
+    return {
+        "match_id": game.get("match_id") or 0,
+        "hero_id": game.get("hero_id") or 0,
+        "hero_name": game.get("hero"),
+        "player_slot": game.get("player_slot") or 0,
+        "radiant_win": str(game.get("result", "")).lower() == "win",
+        # analyze_from_recent пересчитывает результат заново, поэтому для
+        # локальных записей подставляем сторону так, чтобы результат совпал.
+        "duration": num(game.get("duration")) or 0,
+        "kills": num(game.get("kills")),
+        "deaths": num(game.get("deaths")),
+        "assists": num(game.get("assists")),
+        "gold_per_min": num(game.get("gpm")),
+        "xp_per_min": num(game.get("xpm")),
+        "last_hits": num(game.get("last_hits")),
+        "denies": num(game.get("denies")),
+        "hero_damage": num(game.get("hero_damage")),
+        "tower_damage": num(game.get("tower_damage")),
+        "hero_healing": num(game.get("hero_healing")),
+        "level": num(game.get("level")),
+        "net_worth": num(game.get("net_worth")),
+        "start_time": start_time or 0,
+        "game_mode": num(game.get("game_mode")),
+    }
+
+
+def _local_recent_matches(limit: int = 100) -> list[dict]:
+    """Последние матчи из локальной базы в формате recentMatches."""
+    from .stats_engine import get_games
+
+    games = [g for g in get_games() if isinstance(g, dict)]
+    games.sort(key=lambda g: (str(g.get("date") or ""), str(g.get("match_id") or "")),
+               reverse=True)
+    out = []
+    for g in games[:limit]:
+        raw = _local_game_to_recent(g)
+        if raw and raw.get("match_id"):
+            out.append(raw)
+    return out
+
+
+def analyze_all_matches(match_ids: list[int] = None, max_matches: int = 20,
+                        source: str = "live") -> dict:
+    """Быстрый анализ через recentMatches (один запрос).
+
+    source="local" — анализ по локальной базе games.json (работает без сети).
+    """
+    if source == "local":
+        raw_matches = _local_recent_matches(max_matches)
+    else:
+        raw_matches = get_recent_matches_batch(limit=max_matches) or []
     matches = []
     for raw in raw_matches[:max_matches]:
         m = analyze_from_recent(raw)
         matches.append(m)
 
     if not matches:
-        return empty_macro_analysis()
+        empty = empty_macro_analysis()
+        empty["source"] = source
+        return empty
 
     avg_gpm = round(statistics.mean([m["gpm"] for m in matches]), 1)
     avg_xpm = round(statistics.mean([m["xpm"] for m in matches]), 1)
@@ -690,6 +774,7 @@ def analyze_all_matches(match_ids: list[int] = None, max_matches: int = 20) -> d
         "top_errors": error_counter.most_common(5),
         "general_tips": general_tips,
         "matches": matches,
+        "source": source,
     }
 
 

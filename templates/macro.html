@@ -7,6 +7,26 @@
 <h1 class="page-title">📈 Анализ матчей</h1>
 <p class="page-subtitle">Макро-анализ: сравнение с эталоном ранга Legend, частые ошибки, рекомендации</p>
 
+{% if analysis.fallback_reason == 'open_dota_unavailable' %}
+<div class="dota-section">
+    <div class="tip-box warn">
+        ⚠️ <strong>OpenDota сейчас недоступен</strong> — анализ построен по локальной базе
+        <span class="mono">games.json</span> ({{ analysis.matches_analyzed }} матчей).
+        Живые данные подтянутся автоматически, когда API снова ответит.
+        <div class="mt-sm"><a href="/macro" class="btn">🔄 Повторить запрос к OpenDota</a></div>
+    </div>
+</div>
+{% elif analysis.matches_analyzed == 0 and analysis.error %}
+<div class="dota-section">
+    <div class="tip-box warn">
+        ⚠️ <strong>Нет данных для анализа.</strong> OpenDota не вернул матчи, а локальная база пуста.<br>
+        Проверьте доступ к <span class="mono">api.opendota.com</span> и запустите автообновление
+        (<span class="mono">python main.py auto-update start</span>).
+        <div class="mt-sm"><a href="/fresh?refresh=1" class="btn btn-primary">🔄 Обновить матчи</a></div>
+    </div>
+</div>
+{% endif %}
+
 {% if analysis.matches_analyzed == 0 %}
 <div class="dota-section">
     <div class="empty-state">

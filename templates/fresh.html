@@ -7,6 +7,24 @@
 <h1 class="page-title">🔄 Свежие матчи</h1>
 <p class="page-subtitle">Последние матчи, загруженные с OpenDota (сырые данные перед обработкой)</p>
 
+{% if not fresh_matches %}
+<div class="dota-section">
+    <div class="tip-box warn">
+        <strong>{% if source_note == 'error' %}⚠️ OpenDota не отвечает{% else %}📭 Данные ещё не загружены{% endif %}</strong><br>
+        {% if source_note == 'error' %}
+        Запрос к <span class="mono">api.opendota.com</span> не удался — проверьте интернет/доступ к API.
+        Пока сеть недоступна, используйте локальную базу: <a href="/games">все игры</a>.
+        {% else %}
+        OpenDota вернул пустой список матчей для аккаунта
+        <span class="mono">{{ account_id or '—' }}</span>.
+        {% endif %}
+        <div class="mt-sm">
+            <a href="/fresh?refresh=1" class="btn btn-primary">🔄 Обновить сейчас</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <div class="dota-section">
     <div class="dota-section-title">📡 Источник данных</div>
     <div class="stats-grid">
@@ -16,9 +34,9 @@
             <div class="stat-sub">SteamID32</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Матчей в файле</div>
+            <div class="stat-label">Матчей получено</div>
             <div class="stat-value">{{ fresh_matches|length }}</div>
-            <div class="stat-sub">в fresh_matches.json</div>
+            <div class="stat-sub">{% if fresh_matches %}{% if live %}живой ответ OpenDota{% else %}из кэша/файла{% endif %}{% else %}данных нет{% endif %}</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Источник</div>
@@ -95,14 +113,6 @@
             {% endfor %}
         </tbody>
     </table>
-</div>
-{% else %}
-<div class="dota-section">
-    <div class="empty-state">
-        <div class="icon">📭</div>
-        <p>Свежие матчи не загружены. Автообновление подтянет их само каждые 5 минут, пока сервер запущен.</p>
-        <p class="fs-xs mt-sm">После импорта откройте <a href="/">дашборд</a> для просмотра обновлённой статистики.</p>
-    </div>
 </div>
 {% endif %}
 {% endblock %}

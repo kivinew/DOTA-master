@@ -10,6 +10,11 @@
 <!-- Filters Section -->
 <div class="dota-section" style="margin-bottom: 1.5rem;">
     <div class="dota-section-title">🔍 Фильтры</div>
+    <div class="filter-row mb-md" style="display: flex; flex-wrap: wrap; gap: .5rem;">
+        <a href="/games?date_from={{ today }}&date_to={{ today }}" class="btn{% if request.args.get('date_from') == today and request.args.get('date_to') == today %} btn-primary{% endif %}">📅 Сегодня{% if games_today %} ({{ games_today }}){% endif %}</a>
+        <a href="/games?date_from={{ week_ago }}" class="btn{% if request.args.get('date_from') == week_ago %} btn-primary{% endif %}">🗓 7 дней</a>
+        <a href="/games" class="btn">✕ Без фильтра</a>
+    </div>
     <form id="games-filter-form" class="filter-form" method="GET" action="/games">
         <div class="filter-row" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
             <div class="filter-group" style="flex: 1; min-width: 180px;">
@@ -57,7 +62,7 @@
 
 {% if games %}
 <div class="dota-section">
-    <div class="dota-section-title">📊 Игры (страница {{ page }}{% if total_pages > 1 %} из {{ total_pages }}{% endif %})</div>
+    <div class="dota-section-title">📊 Игры (страница {{ page }}{% if total_pages > 1 %} из {{ total_pages }}{% endif %}{% if games_today_str %} · сегодня {{ games_today_str }}{% endif %})</div>
     <table class="dota-table">
         <thead>
             <tr>

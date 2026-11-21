@@ -24,6 +24,7 @@ enable_utf8_console()
 
 from analysis.report_generator import generate_full_report
 from analysis.fresh_cache import get_cached_fresh_view
+from analysis import fresh_cache
 from analysis import config as _cfg  # env: DOTA_ACCOUNT_ID, PORT, DOTA_UPDATE_INTERVAL...
 from analysis.template_utils import register_jinja_globals
 import markdown
@@ -111,8 +112,11 @@ import math
 import threading
 import time
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from flask import Flask, render_template, jsonify, request
+
+# Местное время игрока (UTC+7) — те же даты, что пишет web_fetcher.
+_LOCAL_TZ = timezone(timedelta(hours=7))
 from werkzeug.serving import run_simple
 
 # Ensure import from project root
@@ -273,13 +277,18 @@ def load_fresh_matches():
         live, fresh = get_cached_fresh_view(_cfg.ACCOUNT_ID, limit=20)
         if live:
             return {"fresh_matches": live, "account_id": _cfg.ACCOUNT_ID, "live": fresh}
+        # Пустой ответ API отличим от «ещё не загружали»: это важно в UI.
+        source_note = "empty"
     except Exception:
-        pass
+        source_note = "error"
     path = os.path.join("games", "fresh_matches.json")
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {"fresh_matches": [], "account_id": None}
+            data = json.load(f)
+        if isinstance(data, dict) and data.get("fresh_matches"):
+            return data
+    return {"fresh_matches": [], "account_id": _cfg.ACCOUNT_ID or None,
+            "live": False, "source_note": source_note}
 
 
 def _safe_number(value, default=0):
@@ -637,36 +646,71 @@ def games_page():
     all_heroes = get_all_heroes()
     total_pages = max(1, (total + per_page - 1) // per_page)
 
+    # Даты для быстрых фильтров «Сегодня / 7 дней». Считаем по местному
+    # времени игрока (UTC+7), иначе утренние игры попадают в «вчера».
+    today = datetime.now(_LOCAL_TZ).date()
+    week_ago = today - timedelta(days=6)
+    all_games = [_normalize_game_record(r) for r in get_games()]
+    games_today = sum(1 for g in all_games
+                      if g and str(g.get("date", ""))[:10] == today.isoformat())
+
     return render_template("games.html",
         games=games,
         total_games=total,
         page=page_num,
         per_page=per_page,
         total_pages=total_pages,
-        all_heroes=all_heroes)
+        all_heroes=all_heroes,
+        today=today.isoformat(),
+        week_ago=week_ago.isoformat(),
+        games_today=games_today,
+        games_today_str=f"{today:%d.%m}")
 
 
 @app.route("/fresh")
 def fresh_page():
+    # refresh=1 — обойти TTL-кэш и заново запросить OpenDota (кнопка «Обновить»)
+    if request.args.get("refresh"):
+        try:
+            fresh_cache.invalidate()
+        except Exception:
+            pass
     fresh = load_fresh_matches()
     fresh_sorted = sorted(fresh.get("fresh_matches", []), key=lambda m: (m.get("date", ""), m.get("match_id", 0)), reverse=True)
     return render_template("fresh.html",
         fresh_matches=fresh_sorted,
         account_id=fresh.get("account_id"),
+        live=fresh.get("live"),
+        source_note=fresh.get("source_note"),
         total_games=len(get_games()))
+
+
+def _analyze_with_local_fallback(max_matches: int):
+    """Живой макро-анализ OpenDota, при сбое/отсутствии данных — по games.json."""
+    from analysis.macro_analyzer import analyze_all_matches, empty_macro_analysis
+
+    try:
+        analysis = analyze_all_matches(max_matches=max_matches)
+    except Exception as exc:
+        print(f"  macro: живой анализ недоступен — {exc}")
+        analysis = empty_macro_analysis()
+
+    if analysis.get("matches"):
+        return analysis
+
+    local = analyze_all_matches(max_matches=max_matches, source="local")
+    if local.get("matches"):
+        local["fallback_reason"] = "open_dota_unavailable"
+        return local
+    return analysis
 
 
 @app.route("/macro")
 def macro_page():
     # Шаблон macro.html написан под структуру analyze_all_matches
     # (top_errors, general_tips, avg_lhpm), поэтому берём данные оттуда,
-    # а не из generate_full_report. Сбой сети не должен ронять страницу.
-    from analysis.macro_analyzer import analyze_all_matches, empty_macro_analysis
-    try:
-        analysis = analyze_all_matches(max_matches=100)
-    except Exception as exc:  # сеть/API недоступны — показываем пустое состояние
-        print(f"  /macro: анализ недоступен — {exc}")
-        analysis = empty_macro_analysis()
+    # а не из generate_full_report.
+    analysis = _analyze_with_local_fallback(max_matches=100)
     return render_template("macro.html", analysis=analysis)
 
 
@@ -878,6 +922,12 @@ def match_detail_page(match_id):
 @app.route("/report")
 def report_page():
     report = generate_full_report(max_matches=100)
+    if not report.get("matches"):
+        # OpenDota недоступен — строим отчёт по локальной базе games.json.
+        local = generate_full_report(max_matches=100, source="local")
+        if local.get("matches"):
+            local["fallback_reason"] = "open_dota_unavailable"
+            report = local
     # Конвертируем markdown в HTML для отображения
     report['report'] = markdown_to_html(report.get('report', ''))
     return render_template("report.html", report=report)

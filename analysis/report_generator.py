@@ -76,16 +76,26 @@ def generate_match_summary(match: dict) -> str:
     return "\n".join(lines)
 
 
-def generate_full_report(match_ids: list[int] = None, max_matches: int = 15) -> dict:
-    """Полный отчёт через быстрый recentMatches (один запрос)."""
-    raw_matches = get_recent_matches_batch(limit=max_matches)
+def generate_full_report(match_ids: list[int] = None, max_matches: int = 15,
+                        source: str = "live") -> dict:
+    """Полный отчёт через быстрый recentMatches (один запрос).
+
+    source="local" — отчёт по локальной базе games.json (работает без сети).
+    """
+    if source == "local":
+        from .macro_analyzer import _local_recent_matches
+
+        raw_matches = _local_recent_matches(max_matches)
+    else:
+        raw_matches = get_recent_matches_batch(limit=max_matches) or []
     matches = []
     for raw in raw_matches[:max_matches]:
         m = analyze_from_recent(raw)
         matches.append(m)
 
     if not matches:
-        return {"error": "Нет данных", "report": "Не удалось загрузить матчи."}
+        return {"error": "Нет данных", "report": "Не удалось загрузить матчи.",
+                "source": source}
 
     # Агрегация
     wins = sum(1 for m in matches if m['result'] == 'win')
@@ -236,6 +246,7 @@ def generate_full_report(match_ids: list[int] = None, max_matches: int = 15) -> 
         "worst_kda": {"match_id": worst_kda['match_id'], "kda": worst_kda['kda'], "hero": worst_kda['hero_name']},
         "report": report_text,
         "matches": matches,
+        "source": source,
     }
 
 

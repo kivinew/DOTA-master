@@ -227,15 +227,41 @@ def test_games_rows_are_clickable_with_literal_match_id():
     assert "tabindex=\"0\"" in html
 
 
-def test_macro_page_renders_when_opendota_is_unavailable(monkeypatch):
-    """Сеть/API недоступны — /macro отдаёт пустое состояние, а не 500."""
+def test_macro_page_falls_back_to_local_games_when_opendota_is_down(monkeypatch):
+    """Сеть/API недоступны — /macro считается по локальной базе с баннером."""
     from analysis import macro_analyzer
 
     monkeypatch.setattr(macro_analyzer, "get_recent_matches_batch", lambda *a, **kw: [])
     response = _client().get("/macro")
     assert response.status_code == 200
     body = response.get_data(as_text=True)
+    assert "OpenDota сейчас недоступен" in body
+    assert "Сводка (7 матчей)" in body
+
+
+def test_macro_page_empty_state_when_no_data_at_all(monkeypatch, tmp_path):
+    """Ни API, ни локальной базы — понятное пустое состояние, а не 500."""
+    from analysis import macro_analyzer
+
+    monkeypatch.setattr(stats_engine, "get_games", lambda: [])
+    monkeypatch.setattr(macro_analyzer, "get_recent_matches_batch", lambda *a, **kw: [])
+    response = _client().get("/macro")
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
     assert "Нет данных для анализа" in body
+    assert "Обновить матчи" in body
+
+
+def test_report_page_falls_back_to_local_games(monkeypatch):
+    """Отчёт строится по локальной базе, когда OpenDota недоступен."""
+    from analysis import report_generator
+
+    monkeypatch.setattr(report_generator, "get_recent_matches_batch", lambda *a, **kw: [])
+    response = _client().get("/report")
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
+    assert "OpenDota сейчас недоступен" in body
+    assert "Сводка (7 матчей)" in body
 
 
 def test_macro_page_renders_summary_for_recent_matches(monkeypatch):
@@ -258,3 +284,27 @@ def test_macro_page_renders_summary_for_recent_matches(monkeypatch):
     body = response.get_data(as_text=True)
     assert "Сводка (2 матчей)" in body
     assert "50.0%" in body
+
+
+def test_games_today_shortcut_uses_local_player_time():
+    """«Сегодня» фильтрует по дате в часовом поясе игрока (UTC+7), не UTC."""
+    from datetime import datetime, timedelta, timezone
+
+    tz = timezone(timedelta(hours=7))
+    today = datetime.now(tz).date().isoformat()
+    records = [
+        {"match_id": 1, "date": f"{today}T09:15:00", "hero": "Pugna", "result": "win",
+         "kills": 6, "deaths": 2, "assists": 9, "game_mode": 22},
+        {"match_id": 2, "date": "2020-01-01T09:15:00", "hero": "Axe", "result": "loss",
+         "kills": 2, "deaths": 8, "assists": 3, "game_mode": 22},
+    ]
+    stats_engine._save_games(records)
+
+    page = _client().get("/games").get_data(as_text=True)
+    assert "Сегодня (1)" in page
+
+    filtered = _client().get(f"/games?date_from={today}&date_to={today}").get_data(as_text=True)
+    assert filtered.count("match-row-clickable") == 1
+    # Имена героев есть и в выпадающем списке фильтра — проверяем блок таблицы.
+    table = filtered.split("<tbody>", 1)[1].split("</tbody>", 1)[0]
+    assert "Pugna" in table and "Axe" not in table
