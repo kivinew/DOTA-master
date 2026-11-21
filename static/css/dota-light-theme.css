@@ -1479,6 +1479,7 @@ code {
 .draft-heroes {
     display: flex;
     gap: 8px;
+    row-gap: 32px;
     flex-wrap: wrap;
     justify-content: flex-start;
     align-content: flex-start;
