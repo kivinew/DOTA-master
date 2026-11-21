@@ -100,10 +100,13 @@
         </thead>
         <tbody>
             {% for m in fresh_matches[:10] %}
-            <tr>
+            <tr class="{% if m.match_id %}match-row-clickable{% endif %}"
+                {% if m.match_id %}data-match-id="{{ m.match_id }}" tabindex="0" role="link"
+                onclick="window.location.href='/match/{{ m.match_id }}'"
+                onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.location.href='/match/{{ m.match_id }}'; }"{% endif %}>
                 <td class="muted">{{ loop.index }}</td>
                 <td class="mono fs-xs">
-                    <a href="/match/{{ m.match_id }}" class="gold">{{ m.match_id }}</a>
+                    {% if m.match_id %}<a href="/match/{{ m.match_id }}" class="gold">{{ m.match_id }}</a>{% else %}—{% endif %}
                 </td>
                 <td>
                     <div class="hero-cell">

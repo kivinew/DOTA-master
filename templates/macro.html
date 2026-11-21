@@ -4,8 +4,8 @@
 
 {% block content %}
 <a href="/" class="back-btn">← Дашборд</a>
-<h1 class="page-title">📈 Анализ матчей</h1>
-<p class="page-subtitle">Макро-анализ: сравнение с эталоном ранга Legend, частые ошибки, рекомендации</p>
+<h1 class="page-title">📈 Анализ и отчёт</h1>
+<p class="page-subtitle">Макро-анализ по эталону ранга Legend: сводка, тренд, ошибки, рекомендации и текстовый отчёт по последним матчам</p>
 
 {% if analysis.fallback_reason == 'open_dota_unavailable' %}
 <div class="dota-section">
@@ -73,6 +73,43 @@
     </div>
 </div>
 
+<!-- Тренд -->
+{% if analysis.gpm_trend is defined or analysis.deaths_trend is defined %}
+<div class="dota-section">
+    <div class="dota-section-title">📈 Тренд</div>
+    {% if analysis.gpm_trend and analysis.gpm_trend > 0 %}
+    <div class="tip-box ok">📈 GPM растёт (+{{ analysis.gpm_trend }}) — фармишь эффективнее.</div>
+    {% elif analysis.gpm_trend and analysis.gpm_trend < 0 %}
+    <div class="tip-box warn">📉 GPM падает ({{ analysis.gpm_trend }}) — нужно больше фарма.</div>
+    {% endif %}
+    {% if analysis.deaths_trend and analysis.deaths_trend > 0 %}
+    <div class="tip-box bad">💀 Смертей стало больше (+{{ analysis.deaths_trend }}) — будь осторожнее.</div>
+    {% elif analysis.deaths_trend and analysis.deaths_trend < 0 %}
+    <div class="tip-box ok">✅ Смертей стало меньше ({{ analysis.deaths_trend }}) — молодец!</div>
+    {% endif %}
+    {% if not analysis.gpm_trend and not analysis.deaths_trend %}
+    <p class="muted fs-sm">Пока недостаточно матчей для сравнения первой и второй половины выборки.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Критические ошибки -->
+{% if analysis.critical_errors %}
+<div class="dota-section">
+    <div class="dota-section-title">🔴 Критические ошибки</div>
+    {% for err in analysis.critical_errors %}
+    <div class="error-card">
+        <div class="error-card-title">{{ err.issue }}</div>
+        <div class="error-card-body">
+            <div class="error-stat"><strong>Текущее:</strong> {{ err.value }}</div>
+            <div class="error-stat"><strong>Цель:</strong> {{ err.target }}</div>
+            <div class="error-fix"><strong>Как исправить:</strong> {{ err.fix }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 <!-- Частые ошибки -->
 {% if analysis.top_errors %}
 <div class="dota-section">
@@ -112,7 +149,7 @@
 
 <!-- Таблица матчей -->
 <div class="dota-section">
-    <div class="dota-section-title">📋 Последние матчи <a href="/report" class="fs-xs gold" style="margin-left: 8px;">Полный отчёт →</a></div>
+    <div class="dota-section-title">📋 Последние матчи</div>
     <table class="dota-table">
         <thead>
             <tr>
@@ -172,6 +209,42 @@
         </tbody>
     </table>
 </div>
+
+
+<!-- Лучший и худший матч -->
+{% if analysis.best_kda and analysis.worst_kda %}
+<div class="dota-section">
+    <div class="dota-section-title">🏆 Лучший и худший матч</div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Лучший KDA</div>
+            <div class="stat-value result-win">{{ analysis.best_kda.kda }}</div>
+            <div class="stat-sub">
+                {{ analysis.best_kda.hero }}
+                {% if analysis.best_kda.match_id %}(<a href="/match/{{ analysis.best_kda.match_id }}" class="gold">#{{ analysis.best_kda.match_id }}</a>){% endif %}
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Худший KDA</div>
+            <div class="stat-value result-loss">{{ analysis.worst_kda.kda }}</div>
+            <div class="stat-sub">
+                {{ analysis.worst_kda.hero }}
+                {% if analysis.worst_kda.match_id %}(<a href="/match/{{ analysis.worst_kda.match_id }}" class="gold">#{{ analysis.worst_kda.match_id }}</a>){% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Текстовый отчёт -->
+{% if analysis.report_html %}
+<div class="dota-section">
+    <div class="dota-section-title">📝 Текстовый отчёт</div>
+    <div class="report-text">
+    {{ analysis.report_html | safe }}
+    </div>
+</div>
+{% endif %}
 
 {% endif %}
 {% endblock %}

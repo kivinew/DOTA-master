@@ -102,7 +102,7 @@ OpenDota API -> fetcher.py/web_fetcher.py -> stats_engine.save_matches()
 | /match/<id> | match_detail.html | full analysis, draft, skill build, items, MVP |
 | /errors | errors.html | games with detect_errors flags |
 | /macro | macro.html | aggregate macro analysis |
-| /report | report.html | markdown report |
+| /report | — | 302 redirect to /macro (report page merged into analysis) |
 | /api/games?page=1&per_page=50 | JSON | paginated games (per_page ≤ 200) |
 | /api/* | JSON | same data as pages; errors: `{"status": "error", "message": ...}` |
 

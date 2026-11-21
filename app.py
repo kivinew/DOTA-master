@@ -718,11 +718,19 @@ def _analyze_with_local_fallback(max_matches: int):
 
 @app.route("/macro")
 def macro_page():
-    # Шаблон macro.html написан под структуру analyze_all_matches
-    # (top_errors, general_tips, avg_lhpm), поэтому берём данные оттуда,
-    # а не из generate_full_report.
+    # «Анализ» и «Отчёт» — одна страница: сводка, тренд, ошибки, рекомендации
+    # и текстовый отчёт строятся по одной выборке матчей.
     analysis = _analyze_with_local_fallback(max_matches=100)
+    analysis["report_html"] = markdown_to_html(analysis.get("report_markdown", ""))
     return render_template("macro.html", analysis=analysis)
+
+
+@app.route("/report")
+@app.route("/report/")
+def report_page_legacy():
+    """Старый адрес отчёта — страница объединена с /macro (302, чтобы не
+    дублировать контент под двумя URL)."""
+    return redirect("/macro")
 
 
 @app.route("/api/macro", methods=["GET"])
@@ -928,20 +936,6 @@ def match_detail_page(match_id):
         counter_list=_enemy_counters,
         primary=_primary_counter,
     )
-
-
-@app.route("/report")
-def report_page():
-    report = generate_full_report(max_matches=100)
-    if not report.get("matches"):
-        # OpenDota недоступен — строим отчёт по локальной базе games.json.
-        local = generate_full_report(max_matches=100, source="local")
-        if local.get("matches"):
-            local["fallback_reason"] = "open_dota_unavailable"
-            report = local
-    # Конвертируем markdown в HTML для отображения
-    report['report'] = markdown_to_html(report.get('report', ''))
-    return render_template("report.html", report=report)
 
 
 @app.route("/heroes")

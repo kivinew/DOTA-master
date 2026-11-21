@@ -5,7 +5,7 @@
 ## Структура
 
 - `main.py` — CLI: `add`, `import <csv>`, `report`, `hero <name>`, `list`, `errors`, `fetch`, `fetch-heroes`, `auto-update start|stop|status`
-- `app.py` — Flask app. Страницы: `/`, `/games` (история + живые матчи, бывшая `/fresh` — редирект на `/games#live`), `/errors`, `/macro`, `/report`, `/heroes`, `/hero/<name>`, `/match/<id>`, `/api`, `/healthz`. Запуск через `run_simple`, без reloader/debugger
+- `app.py` — Flask app. Страницы: `/`, `/games` (история + живые матчи, бывшая `/fresh` — редирект на `/games#live`), `/errors`, `/macro` (объединённая «Анализ и отчёт»; `/report` — редирект на `/macro`), `/heroes`, `/hero/<name>`, `/match/<id>`, `/api`, `/healthz`. Запуск через `run_simple`, без reloader/debugger
 - `analysis/stats_engine.py` — хранилище `games/games.json`, `add_game`, `import_csv`, `merge_games` (дедуп по `match_id`/CSV-ключу), `global_stats`, `hero_stats`, `detect_errors`, `analyze_all_games`, `get_game_by_match_id`, in-memory indexes (`_match_id_index`, `_hero_index`)
 - `analysis/config.py` — единый конфиг через env (`DOTA_ACCOUNT_ID`, `PORT`, `DOTA_UPDATE_INTERVAL`, `DOTA_MAX_MATCHES`, `DOTA_MASTER_SECRET`, `DOTA_STEAM_ID64`); использовать его, не хардкодить
 - `analysis/http.py` — единый HTTP-клиент (`fetch_json` с retry); новый сетевой код — только через него

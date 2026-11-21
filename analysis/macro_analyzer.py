@@ -626,6 +626,68 @@ def analyze_from_recent(raw_match: dict) -> dict:
     }
 
 
+_ERROR_LABELS = {
+    "gpm": "Низкий GPM", "xpm": "Низкий XPM", "lhpm": "Мало ластхитов",
+    "deaths": "Много смертей", "td": "Мало урона по башням",
+    "dpm": "Мало урона по героям", "kda": "Низкий KDA",
+    "kill_part": "Низкий вклад в убийства",
+}
+
+
+def _build_macro_report_markdown(matches, win_rate, avg_kda, avg_gpm, avg_xpm,
+                                 avg_lhpm, avg_deaths, avg_dpm, avg_td,
+                                 gpm_trend, deaths_trend, critical_errors,
+                                 error_counter, best, worst) -> str:
+    """Текстовый (markdown) отчёт по той же выборке, что и макро-анализ."""
+    lines = [
+        "# 📊 Отчёт по последним матчам",
+        f"**Матчей в выборке:** {len(matches)}",
+        "",
+        "## Общие показатели",
+        f"- **Винрейт:** {win_rate}%",
+        f"- **Средний KDA:** {avg_kda} (цель: 3.5+)",
+        f"- **Средний GPM:** {avg_gpm} (цель: 600+)",
+        f"- **Средний XPM:** {avg_xpm} (цель: 700+)",
+        f"- **Lasthits/мин:** {avg_lhpm} (цель: 6.0)",
+        f"- **Смертей за игру:** {avg_deaths} (цель: ≤4)",
+        f"- **Урон по героям (DPM):** {avg_dpm}",
+        f"- **Урон по башням:** {avg_td:.0f}",
+        "",
+        "## Тренд",
+    ]
+    if gpm_trend:
+        lines.append(f"- GPM: {'+' if gpm_trend > 0 else ''}{gpm_trend} к последним матчам")
+    if deaths_trend:
+        lines.append(f"- Смерти: {'+' if deaths_trend > 0 else ''}{deaths_trend} к последним матчам")
+    if not gpm_trend and not deaths_trend:
+        lines.append("- Недостаточно матчей для сравнения периодов.")
+    lines.append("")
+
+    if critical_errors:
+        lines.append("## 🔴 Критические ошибки")
+        for err in critical_errors:
+            lines.append(f"### {err['issue']}")
+            lines.append(f"- **Текущее:** {err['value']}")
+            lines.append(f"- **Цель:** {err['target']}")
+            lines.append(f"- **Как исправить:** {err['fix']}")
+            lines.append("")
+
+    if error_counter:
+        lines.append("## ⚠️ Частые проблемы")
+        for key, count in error_counter.most_common():
+            pct = round(count / len(matches) * 100)
+            lines.append(f"- **{_ERROR_LABELS.get(key, key)}:** {count} из {len(matches)} матчей ({pct}%)")
+        lines.append("")
+
+    lines.extend([
+        "## Лучший и худший матч",
+        f"- **Лучший KDA:** {best['kda']} ({best['hero_name']}, матч {best.get('match_id') or '—'})",
+        f"- **Худший KDA:** {worst['kda']} ({worst['hero_name']}, матч {worst.get('match_id') or '—'})",
+        "",
+    ])
+    return "\n".join(lines)
+
+
 def empty_macro_analysis() -> dict:
     """Пустая, но полностью заполненная структура для macro.html.
 
@@ -637,6 +699,8 @@ def empty_macro_analysis() -> dict:
         "error": "Нет данных",
         "win_rate": 0, "avg_gpm": 0, "avg_xpm": 0, "avg_kda": 0,
         "avg_lhpm": 0, "avg_deaths": 0, "avg_dpm": 0, "avg_tower_damage": 0,
+        "gpm_trend": 0, "deaths_trend": 0,
+        "critical_errors": [], "best_kda": None, "worst_kda": None,
         "top_errors": [], "general_tips": [], "matches": [],
     }
 
@@ -765,15 +829,68 @@ def analyze_all_matches(match_ids: list[int] = None, max_matches: int = 20,
     wins = sum(1 for m in matches if m["result"] == "win")
     win_rate = round(wins / len(matches) * 100, 1)
 
+    # Тренд: первая половина выборки против второй (свежие матчи идут первыми,
+    # поэтому переворачиваем — хотим «было → стало»).
+    chronological = list(reversed(matches))
+    half = max(1, len(chronological) // 2)
+    first_half, second_half = chronological[:half], chronological[half:]
+    if second_half:
+        gpm_trend = round(
+            statistics.mean([m["gpm"] for m in second_half])
+            - statistics.mean([m["gpm"] for m in first_half]), 1)
+        deaths_trend = round(
+            statistics.mean([m["deaths"] for m in second_half])
+            - statistics.mean([m["deaths"] for m in first_half]), 1)
+    else:
+        gpm_trend = deaths_trend = 0
+
+    # Критические ошибки: конкретные значения и что делать.
+    critical_errors = []
+    if avg_deaths > BENCHMARKS["deaths"]["warn"]:
+        critical_errors.append({
+            "issue": "Высокая смертность",
+            "value": f"{avg_deaths} смертей за игру",
+            "target": f"≤{BENCHMARKS['deaths']['good']}",
+            "fix": "Смотри миникарту после каждого каста. Не лезь в бой без видения — держи дистанцию.",
+        })
+    if avg_lhpm < BENCHMARKS["lhpm"]["mid"]:
+        critical_errors.append({
+            "issue": "Мало ластхитов",
+            "value": f"{avg_lhpm}/мин",
+            "target": f"≥{BENCHMARKS['lhpm']['mid']}/мин",
+            "fix": "Практикуй тайминги в тренировке, забирай волны перед ротацией.",
+        })
+    if avg_td < BENCHMARKS["td"]["mid"]:
+        critical_errors.append({
+            "issue": "Мало урона по башням",
+            "value": f"{avg_td:.0f}",
+            "target": f"≥{BENCHMARKS['td']['mid']}",
+            "fix": "Играй от объектов: после выигранной драки сразу пуш линию.",
+        })
+
+    best = max(matches, key=lambda m: m["kda"])
+    worst = min(matches, key=lambda m: m["kda"])
+
     return {
         "matches_analyzed": len(matches),
         "win_rate": win_rate,
         "avg_gpm": avg_gpm, "avg_xpm": avg_xpm,
         "avg_lhpm": avg_lhpm, "avg_deaths": avg_deaths,
         "avg_kda": avg_kda, "avg_tower_damage": avg_td, "avg_dpm": avg_dpm,
+        "gpm_trend": gpm_trend, "deaths_trend": deaths_trend,
+        "critical_errors": critical_errors,
+        "best_kda": {"match_id": best.get("match_id"), "kda": best["kda"],
+                     "hero": best["hero_name"]},
+        "worst_kda": {"match_id": worst.get("match_id"), "kda": worst["kda"],
+                      "hero": worst["hero_name"]},
         "top_errors": error_counter.most_common(5),
         "general_tips": general_tips,
         "matches": matches,
+        "report_markdown": _build_macro_report_markdown(
+            matches, win_rate, avg_kda, avg_gpm, avg_xpm, avg_lhpm,
+            avg_deaths, avg_dpm, avg_td, gpm_trend, deaths_trend,
+            critical_errors, error_counter, best, worst,
+        ),
         "source": source,
     }
 
