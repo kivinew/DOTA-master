@@ -3,6 +3,7 @@
 
 import csv
 import json
+import math
 import os
 import statistics
 from datetime import datetime, date as DateType
@@ -305,16 +306,30 @@ def global_stats() -> dict:
 
 
 def detect_errors(game: dict) -> list[str]:
-    """Пометить критические ошибки в одной игре."""
+    """Пометить критические ошибки, не падая на неполных старых записях."""
+    if not isinstance(game, dict):
+        return []
+
+    def metric(key, alias=None):
+        value = game.get(key, game.get(alias, 0) if alias else 0)
+        try:
+            number = float(value or 0)
+            if not math.isfinite(number):
+                return 0
+            return int(number) if number.is_integer() else number
+        except (TypeError, ValueError, OverflowError):
+            return 0
+
     errors = []
-    d = game["deaths"]
-    k = game["kills"]
-    a = game["assists"]
-    rotl = game["rotl"]
-    gpm = game["gpm"]
-    xpm = game["xpm"]
+    d = metric("deaths", "D")
+    k = metric("kills", "K")
+    a = metric("assists", "A")
+    rotl = metric("rotl", "RoTL")
+    gpm = metric("gpm", "GPM")
+    xpm = metric("xpm", "XPM")
+    result = str(game.get("result") or "").strip().lower()
     # KDA < 0.5 и проигрыш — попадает в неэффективные игры
-    if d > 0 and (k + a) / d < 0.5 and game["result"] == "loss":
+    if d > 0 and (k + a) / d < 0.5 and result == "loss":
         errors.append(f"Низкий KDA ({round((k+a)/d, 2)}) в проигравшей игре — выбывание из фокуса")
     # RoTL < 10 — почти отсутствие работы на линии.
     # rotl == 0 означает «нет данных» (OpenDota его не отдаёт, fetcher пишет 0.0),

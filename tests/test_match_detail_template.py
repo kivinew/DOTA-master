@@ -19,13 +19,21 @@ def test_match_detail_has_one_score_compact_counter_and_item_fallback():
         "team_avg": {"gpm": 450, "xpm": 550, "deaths": 5},
         "mvp_radiant": None, "mvp_dire": None,
     }
+    picks = [
+        {"team": 0, "is_pick": True, "hero_id": 74, "hero_name": "Invoker",
+         "kills": 4, "deaths": 2, "assists": 10, "position": 2, "hero_items": []},
+        {"team": 1, "is_pick": True, "hero_id": 2, "hero_name": "Axe",
+         "kills": 8, "deaths": 4, "assists": 4, "position": 3, "hero_items": []},
+    ]
     with app.test_request_context("/match/9098079575"):
         html = render_template(
-            "match_detail.html", match=match, picks_bans=[],
-            counter_list=["Axe", "Invoker"], primary="Axe",
+            "match_detail.html", match=match, picks_bans=picks,
+            counter_list=["Axe"], primary="Axe",
         )
 
     assert html.count("final-score") == 1
+    assert "МОЙ KDA" in html and "KDA 7.0" in html
+    assert "KDA 3.0" in html
     assert "counter-matchup" in html
     assert "item-tooltip" in html
     assert "item_placeholder.svg" in html
