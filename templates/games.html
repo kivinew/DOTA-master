@@ -4,8 +4,8 @@
 
 {% block content %}
 <a href="/" class="back-btn">← Назад к дашборду</a>
-<h1 class="page-title">📋 Все игры</h1>
-<p class="page-subtitle">Полный список игр в базе DOTA_MASTER ({{ total_games }} игр)</p>
+<h1 class="page-title">📋 Игры</h1>
+<p class="page-subtitle">История матчей из базы DOTA_MASTER ({{ total_games }} игр) и живые матчи из OpenDota</p>
 
 <!-- Filters Section -->
 <div class="dota-section" style="margin-bottom: 1.5rem;">
@@ -58,6 +58,90 @@
             </div>
         </div>
     </form>
+</div>
+
+<!-- Живые матчи из OpenDota (бывшая страница /fresh) -->
+<div class="dota-section" id="live">
+    <div class="dota-section-title">🔄 Свежие матчи из OpenDota ({{ fresh_matches|length }})</div>
+
+    {% if not fresh_matches %}
+    <div class="tip-box warn">
+        <strong>{% if source_note == 'error' %}⚠️ OpenDota не отвечает{% else %}📭 Данные ещё не загружены{% endif %}</strong><br>
+        {% if source_note == 'error' %}
+        Запрос к <span class="mono">api.opendota.com</span> не удался — проверьте интернет/доступ к API.
+        Ниже — история из локальной базы, она доступна всегда.
+        {% else %}
+        OpenDota вернул пустой список матчей для аккаунта
+        <span class="mono">{{ account_id or '—' }}</span>.
+        {% endif %}
+    </div>
+    {% else %}
+    <p class="muted fs-sm mb-md">
+        {% if live %}Живой ответ OpenDota{% else %}Данные из кэша — обновляются в фоне{% endif %}
+        · Account ID <span class="mono">{{ account_id or '—' }}</span>
+        {% if fresh_latest %} · последний матч: {{ fresh_latest }}{% endif %}
+    </p>
+    <table class="dota-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Match ID</th>
+                <th>Герой</th>
+                <th class="center">Результат</th>
+                <th class="num">K</th>
+                <th class="num">D</th>
+                <th class="num">A</th>
+                <th class="num">KDA</th>
+                <th>Длительность</th>
+                <th>Сторона</th>
+                <th>Мода</th>
+                <th>Когда</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in fresh_matches[:10] %}
+            <tr>
+                <td class="muted">{{ loop.index }}</td>
+                <td class="mono fs-xs">
+                    <a href="/match/{{ m.match_id }}" class="gold">{{ m.match_id }}</a>
+                </td>
+                <td>
+                    <div class="hero-cell">
+                        <img class="hero-thumb" src="{{ hero_img_url(m.hero) }}" alt="{{ m.hero }}"
+                             onerror="this.style.display='none'">
+                        <span>{{ m.hero }}</span>
+                    </div>
+                </td>
+                <td class="center">
+                    {% if m.result == 'win' %}
+                    <span class="result-win">V</span>
+                    {% else %}
+                    <span class="result-loss">X</span>
+                    {% endif %}
+                </td>
+                <td class="num">{{ m.K }}</td>
+                <td class="num">{{ m.D }}</td>
+                <td class="num">{{ m.A }}</td>
+                <td class="num">
+                    {% set _kda = (m.K + m.A) / (m.D if m.D > 0 else 1) %}
+                    {{ "%.1f"|format(_kda) }}
+                </td>
+                <td class="mono fs-sm">{{ m.duration }}</td>
+                <td class="center fs-sm">{{ m.side }}</td>
+                <td class="muted fs-sm">{{ game_mode_name(m.game_mode) }}</td>
+                <td class="muted fs-xs">{{ m.time_ago }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if fresh_matches|length > 10 %}
+    <p class="muted fs-xs mt-sm">Показаны последние 10 из {{ fresh_matches|length }} живых матчей.</p>
+    {% endif %}
+    {% endif %}
+
+    <div class="mt-sm">
+        <a href="/games?refresh=1#live" class="btn btn-primary">🔄 Обновить из OpenDota</a>
+    </div>
 </div>
 
 {% if games %}
