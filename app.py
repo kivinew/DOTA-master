@@ -658,8 +658,15 @@ def fresh_page():
 
 @app.route("/macro")
 def macro_page():
-    # generate_full_report сам загружает recentMatches одним запросом
-    analysis = generate_full_report(max_matches=100)
+    # Шаблон macro.html написан под структуру analyze_all_matches
+    # (top_errors, general_tips, avg_lhpm), поэтому берём данные оттуда,
+    # а не из generate_full_report. Сбой сети не должен ронять страницу.
+    from analysis.macro_analyzer import analyze_all_matches, empty_macro_analysis
+    try:
+        analysis = analyze_all_matches(max_matches=100)
+    except Exception as exc:  # сеть/API недоступны — показываем пустое состояние
+        print(f"  /macro: анализ недоступен — {exc}")
+        analysis = empty_macro_analysis()
     return render_template("macro.html", analysis=analysis)
 
 
