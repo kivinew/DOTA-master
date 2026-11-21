@@ -25,12 +25,62 @@ for /f "tokens=5" %%a in ('netstat -ano ^| findstr :9999') do (
 timeout /t 1 /nobreak >nul
 
 rem ==================================================
-rem Synchronize with remote repository
+rem Full repository synchronization (two-way)
 rem ==================================================
-echo Syncing with remote repository...
-git fetch origin >nul 2>&1
+echo ==================================================
+echo Synchronizing repository...
+echo ==================================================
+
+rem 1. Reset runtime files that should not be committed
 git checkout -- games/.auto_update.pid >nul 2>&1
-git pull --ff-only origin master 2>&1 | findstr /v /c:"Already up to date" /c:"Fast-forward" /c:"create mode" || echo Sync complete.
+
+rem 2. Check for local changes (staged + unstaged + untracked)
+git status --porcelain >nul 2>&1
+if not errorlevel 1 (
+    echo Local changes detected, committing...
+    git add -A >nul 2>&1
+    git commit -m "Auto-sync: local changes from %COMPUTERNAME% at %DATE% %TIME%" >nul 2>&1
+    if errorlevel 1 (
+        echo Warning: commit failed (maybe nothing to commit)
+    ) else (
+        echo Local commit created.
+    )
+) else (
+    echo No local changes.
+)
+
+rem 3. Fetch remote
+echo Fetching remote...
+git fetch origin >nul 2>&1
+
+rem 4. Check if remote has new commits
+git rev-list HEAD..origin/master --count >nul 2>&1
+set REMOTE_AHEAD=%ERRORLEVEL%
+git rev-list HEAD..origin/master --count 2>nul | findstr /r "^[1-9]" >nul
+if not errorlevel 1 (
+    echo Remote has new commits, pulling...
+    git pull --ff-only origin master 2>&1 | findstr /v /c:"Already up to date" /c:"Fast-forward" /c:"create mode" || echo Pull complete.
+) else (
+    echo Local is up to date with remote.
+)
+
+rem 5. Push local commits if any
+git rev-list origin/master..HEAD --count 2>nul | findstr /r "^[1-9]" >nul
+if not errorlevel 1 (
+    echo Pushing local commits to remote...
+    git push origin master >nul 2>&1
+    if not errorlevel 1 (
+        echo Push complete.
+    ) else (
+        echo Warning: push failed (maybe authentication needed).
+    )
+) else (
+    echo No local commits to push.
+)
+
+echo ==================================================
+echo Sync complete.
+echo ==================================================
 echo.
 
 rem Run server in this window
