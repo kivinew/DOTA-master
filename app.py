@@ -560,7 +560,7 @@ def index():
 @app.route("/hero/<hero>")
 def hero_page(hero):
     stats = hero_stats(hero)
-    games = sorted(get_hero_games(hero), key=lambda g: (g.get("date", ""), g.get("match_id", 0)), reverse=True)
+    games = sorted(get_hero_games(hero), key=lambda g: (g.get("date", ""), int(g.get("match_id", 0)) if g.get("match_id") else 0), reverse=True)
     report = hero_strategies_report(hero)
     return render_template("hero.html",
         hero=hero,
