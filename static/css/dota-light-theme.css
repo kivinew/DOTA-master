@@ -1560,6 +1560,7 @@ code {
 .draft-hero-items {
     display: flex;
     gap: 2px;
+    row-gap: 6px;
     margin-top: 4px;
     justify-content: center;
     flex-wrap: wrap;
