@@ -253,15 +253,59 @@ def test_macro_page_empty_state_when_no_data_at_all(monkeypatch, tmp_path):
 
 
 def test_report_page_falls_back_to_local_games(monkeypatch):
-    """Отчёт строится по локальной базе, когда OpenDota недоступен."""
-    from analysis import report_generator
+    """/report = объединённая страница анализа; при недоступном API — по games.json."""
+    from analysis import macro_analyzer
 
-    monkeypatch.setattr(report_generator, "get_recent_matches_batch", lambda *a, **kw: [])
+    monkeypatch.setattr(macro_analyzer, "get_recent_matches_batch", lambda *a, **kw: [])
     response = _client().get("/report")
-    assert response.status_code == 200
-    body = response.get_data(as_text=True)
+    assert response.status_code == 302
+    assert response.headers["Location"].endswith("/macro")
+    body = _client().get("/macro").get_data(as_text=True)
     assert "OpenDota сейчас недоступен" in body
     assert "Сводка (7 матчей)" in body
+    assert "Текстовый отчёт" in body
+
+
+def test_report_route_is_merged_into_analysis_page():
+    """/report и /macro — одна страница: без отдельного меню и шаблона."""
+    html = _client().get("/macro").get_data(as_text=True)
+    nav = html.split('<nav class="nav-bar">', 1)[1].split("</nav>", 1)[0]
+    assert 'href="/macro' in nav
+    assert "/report" not in nav
+    # старая ссылка с трейлинг-слэшем всё ещё работает
+    legacy = _client().get("/report/")
+    assert legacy.status_code == 302
+    assert legacy.headers["Location"].endswith("/macro")
+
+
+def test_analysis_page_has_unified_sections(monkeypatch):
+    """На объединённой странице есть и макро-анализ, и содержимое отчёта."""
+    from analysis import macro_analyzer
+
+    fake = [
+        {"match_id": 1, "hero_id": 74, "player_slot": 0, "radiant_win": True, "duration": 2400,
+         "kills": 9, "deaths": 2, "assists": 14, "gold_per_min": 640, "xp_per_min": 760,
+         "last_hits": 260, "denies": 10, "hero_damage": 30000, "tower_damage": 4200,
+         "hero_healing": 0, "level": 24, "net_worth": 24000},
+        {"match_id": 2, "hero_id": 45, "player_slot": 128, "radiant_win": True, "duration": 2100,
+         "kills": 3, "deaths": 9, "assists": 7, "gold_per_min": 380, "xp_per_min": 430,
+         "last_hits": 70, "denies": 2, "hero_damage": 9000, "tower_damage": 300,
+         "hero_healing": 0, "level": 16, "net_worth": 11000},
+    ]
+    monkeypatch.setattr(macro_analyzer, "get_recent_matches_batch", lambda *a, **kw: fake)
+    body = _client().get("/macro").get_data(as_text=True)
+    for section in ("📊 Сводка", "📈 Тренд", "💡 Рекомендации", "📋 Последние матчи",
+                    "🏆 Лучший и худший матч", "📝 Текстовый отчёт"):
+        assert section in body, section
+
+
+def test_hero_rows_are_clickable_with_literal_url():
+    """На /heroes вся строка открывает страницу героя, не только имя."""
+    body = _client().get("/heroes").get_data(as_text=True)
+    assert "match-row-clickable" in body
+    assert 'onclick="window.location.href=\'' in body
+    assert "data-hero=" in body
+    assert 'role="link"' in body
 
 
 def test_macro_page_renders_summary_for_recent_matches(monkeypatch):

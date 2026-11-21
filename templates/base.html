@@ -26,8 +26,7 @@
             <a href="{{ url_for('index') }}" class="nav-link{% if path == '/' %} active{% endif %}">📊 Дашборд</a>
             <a href="{{ url_for('games_page') }}" class="nav-link{% if path.startswith('/games') %} active{% endif %}">📋 Игры</a>
             <a href="{{ url_for('errors_page') }}" class="nav-link{% if path.startswith('/errors') %} active{% endif %}">⚠️ Ошибки</a>
-            <a href="{{ url_for('macro_page') }}" class="nav-link{% if path.startswith('/macro') %} active{% endif %}">📈 Анализ</a>
-            <a href="{{ url_for('report_page') }}" class="nav-link{% if path.startswith('/report') %} active{% endif %}">📋 Отчёт</a>
+            <a href="{{ url_for('macro_page') }}" class="nav-link{% if path.startswith('/macro') or path.startswith('/report') %} active{% endif %}">📈 Анализ</a>
             <a href="{{ url_for('heroes_page') }}" class="nav-link{% if path.startswith('/heroes') %} active{% endif %}">👹 Герои</a>
             <a href="{{ url_for('api_page') }}" class="nav-link{% if path.startswith('/api') %} active{% endif %}">📖 API</a>
         </nav>
