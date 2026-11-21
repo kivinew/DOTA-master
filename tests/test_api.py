@@ -217,3 +217,44 @@ def test_api_auto_update_status():
     assert d["status"] == "success"
     assert "data" in d
     assert "running" in d["data"]
+
+
+def test_games_rows_are_clickable_with_literal_match_id():
+    """Строка игры открывает /match/<id>: id подставляется Jinja, не JS-переменной."""
+    html = _client().get("/games").get_data(as_text=True)
+    assert "onclick=\"window.location.href='/match/900000'" in html
+    assert "+ g.match_id" not in html
+    assert "tabindex=\"0\"" in html
+
+
+def test_macro_page_renders_when_opendota_is_unavailable(monkeypatch):
+    """Сеть/API недоступны — /macro отдаёт пустое состояние, а не 500."""
+    from analysis import macro_analyzer
+
+    monkeypatch.setattr(macro_analyzer, "get_recent_matches_batch", lambda *a, **kw: [])
+    response = _client().get("/macro")
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
+    assert "Нет данных для анализа" in body
+
+
+def test_macro_page_renders_summary_for_recent_matches(monkeypatch):
+    """Нормальный ответ API: сводка строится по analyze_all_matches-структуре."""
+    from analysis import macro_analyzer
+
+    fake = [
+        {"match_id": 1, "hero_id": 74, "player_slot": 0, "radiant_win": True, "duration": 2400,
+         "kills": 8, "deaths": 3, "assists": 12, "gold_per_min": 620, "xp_per_min": 730,
+         "last_hits": 240, "denies": 12, "hero_damage": 22000, "tower_damage": 3200,
+         "hero_healing": 0, "level": 22, "net_worth": 21000},
+        {"match_id": 2, "hero_id": 45, "player_slot": 128, "radiant_win": True, "duration": 2100,
+         "kills": 3, "deaths": 9, "assists": 7, "gold_per_min": 380, "xp_per_min": 430,
+         "last_hits": 70, "denies": 2, "hero_damage": 9000, "tower_damage": 300,
+         "hero_healing": 0, "level": 16, "net_worth": 11000},
+    ]
+    monkeypatch.setattr(macro_analyzer, "get_recent_matches_batch", lambda *a, **kw: fake)
+    response = _client().get("/macro")
+    assert response.status_code == 200
+    body = response.get_data(as_text=True)
+    assert "Сводка (2 матчей)" in body
+    assert "50.0%" in body

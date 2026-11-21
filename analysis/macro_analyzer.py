@@ -626,16 +626,31 @@ def analyze_from_recent(raw_match: dict) -> dict:
     }
 
 
+def empty_macro_analysis() -> dict:
+    """Пустая, но полностью заполненная структура для macro.html.
+
+    Шаблон обращается к ключам напрямую (analysis.win_rate, analysis.top_errors...),
+    поэтому и при отсутствии данных отдаём все поля сразу.
+    """
+    return {
+        "matches_analyzed": 0,
+        "error": "Нет данных",
+        "win_rate": 0, "avg_gpm": 0, "avg_xpm": 0, "avg_kda": 0,
+        "avg_lhpm": 0, "avg_deaths": 0, "avg_dpm": 0, "avg_tower_damage": 0,
+        "top_errors": [], "general_tips": [], "matches": [],
+    }
+
+
 def analyze_all_matches(match_ids: list[int] = None, max_matches: int = 20) -> dict:
     """Быстрый анализ через recentMatches (один запрос)."""
-    raw_matches = get_recent_matches_batch(limit=max_matches)
+    raw_matches = get_recent_matches_batch(limit=max_matches) or []
     matches = []
     for raw in raw_matches[:max_matches]:
         m = analyze_from_recent(raw)
         matches.append(m)
 
     if not matches:
-        return {"matches_analyzed": 0, "error": "Нет данных"}
+        return empty_macro_analysis()
 
     avg_gpm = round(statistics.mean([m["gpm"] for m in matches]), 1)
     avg_xpm = round(statistics.mean([m["xpm"] for m in matches]), 1)
