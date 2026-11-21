@@ -1442,40 +1442,17 @@ code {
     color: var(--dota-text-muted);
     flex-shrink: 0;
 }
-.draft-score {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    padding: 4px 16px 16px;
-}
-.final-score .team-score {
-    font-size: 2.4rem;
-}
-.team-score {
-    font-size: 2rem;
+/* Итоговый счёт команды в шапке драфта: Radiant — Dire. */
+.draft-label-score {
+    margin-left: 6px;
+    padding-left: 8px;
+    border-left: 1px solid currentColor;
+    font-size: 0.85rem;
     font-weight: 800;
-    line-height: 1;
+    letter-spacing: 0;
 }
-.team-score.radiant {
-    color: var(--dota-green);
-}
-.team-score.dire {
-    color: var(--dota-red);
-}
-.team-score.radiant.won {
-    color: var(--dota-green);
-    text-shadow: 0 0 14px rgba(90, 138, 74, 0.35);
-}
-.team-score.dire.won {
-    color: var(--dota-red);
-    text-shadow: 0 0 14px rgba(146, 74, 74, 0.35);
-}
-.score-vs {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--dota-text-muted);
-}
+.draft-label.radiant .draft-label-score { color: var(--dota-green); }
+.draft-label.dire .draft-label-score { color: var(--dota-red); }
 
 .draft-teams {
     display: grid;

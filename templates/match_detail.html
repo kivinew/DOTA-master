@@ -25,16 +25,6 @@
     </div>
 </div>
 
-<!-- Итоговый счет -->
-<div class="dota-section" style="margin-top: 10px;">
-    <div class="dota-section-title">Счет</div>
-    <div class="draft-score final-score">
-        <span class="team-score radiant{% if match.radiant_win %} won{% endif %}">{{ match.radiant_score | default(0, true) }}</span>
-        <span class="score-vs">:</span>
-        <span class="team-score dire{% if not match.radiant_win %} won{% endif %}">{{ match.dire_score | default(0, true) }}</span>
-    </div>
-</div>
-
 <!-- Проблемы/Рекомендации -->
 {% if match.tips %}
 <div class="dota-section">
@@ -54,10 +44,12 @@
     <div class="draft-header">
         <span class="draft-label radiant">
             {% if match.radiant_win %}🏆{% else %}💀{% endif %} RADIANT
+            <span class="draft-label-score">{{ match.radiant_score | default(0, true) }}</span>
         </span>
         <span class="draft-vs">VS</span>
         <span class="draft-label dire">
             {% if not match.radiant_win %}🏆{% else %}💀{% endif %} DIRE
+            <span class="draft-label-score">{{ match.dire_score | default(0, true) }}</span>
         </span>
         {% set mvp = match.mvp_radiant or match.mvp_dire %}
         {% set mvp_team = "Radiant" if match.mvp_radiant else ("Dire" if match.mvp_dire else "—") %}
