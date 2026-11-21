@@ -113,7 +113,7 @@ import threading
 import time
 import logging
 from datetime import datetime, timedelta, timezone
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect
 
 # Местное время игрока (UTC+7) — те же даты, что пишет web_fetcher.
 _LOCAL_TZ = timezone(timedelta(hours=7))
@@ -654,6 +654,18 @@ def games_page():
     games_today = sum(1 for g in all_games
                       if g and str(g.get("date", ""))[:10] == today.isoformat())
 
+    # Живые матчи OpenDota теперь живут на этой же странице (бывшая /fresh).
+    # refresh=1 — обойти TTL-кэш и заново запросить API.
+    if request.args.get("refresh"):
+        try:
+            fresh_cache.invalidate()
+        except Exception:
+            pass
+    fresh = load_fresh_matches()
+    fresh_sorted = sorted(fresh.get("fresh_matches", []),
+                          key=lambda m: (m.get("date", ""), m.get("match_id", "")),
+                          reverse=True)
+
     return render_template("games.html",
         games=games,
         total_games=total,
@@ -664,25 +676,24 @@ def games_page():
         today=today.isoformat(),
         week_ago=week_ago.isoformat(),
         games_today=games_today,
-        games_today_str=f"{today:%d.%m}")
+        games_today_str=f"{today:%d.%m}",
+        fresh_matches=fresh_sorted,
+        fresh_latest=(fresh_sorted[0].get("date") if fresh_sorted else None),
+        account_id=fresh.get("account_id"),
+        live=fresh.get("live"),
+        source_note=fresh.get("source_note"))
 
 
 @app.route("/fresh")
 def fresh_page():
-    # refresh=1 — обойти TTL-кэш и заново запросить OpenDota (кнопка «Обновить»)
+    """Старый адрес «свежих матчей»: страница объединена с /games.
+
+    #live — якорь на секцию живых матчей, refresh=1 пробрасываем,
+    чтобы кнопки «Обновить из OpenDota» в старых ссылках работали.
+    """
     if request.args.get("refresh"):
-        try:
-            fresh_cache.invalidate()
-        except Exception:
-            pass
-    fresh = load_fresh_matches()
-    fresh_sorted = sorted(fresh.get("fresh_matches", []), key=lambda m: (m.get("date", ""), m.get("match_id", 0)), reverse=True)
-    return render_template("fresh.html",
-        fresh_matches=fresh_sorted,
-        account_id=fresh.get("account_id"),
-        live=fresh.get("live"),
-        source_note=fresh.get("source_note"),
-        total_games=len(get_games()))
+        return redirect("/games?refresh=1#live")
+    return redirect("/games#live")
 
 
 def _analyze_with_local_fallback(max_matches: int):

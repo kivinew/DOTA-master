@@ -60,7 +60,7 @@ python -m pytest tests/test_stats_engine.py -q  # single test file
 | http.py | Shared HTTP client (`fetch_json` with retry on 429/network errors). All network code must use this. |
 | fetcher.py | OpenDota API: get_player_matches, normalize_open_dota_match, save_matches, resolve_steam_profile, get_heroes_list. Rate limit 1s, User-Agent: DOTA_MASTER/1.0. |
 | web_fetcher.py | OpenDota API (альтернатива API): загрузка recentMatches + догоняющий запрос |
-| fresh_cache.py | TTL cache (60s) stale-while-revalidate for fresh matches. `/` and `/fresh` hit this, not API directly. |
+| fresh_cache.py | TTL cache (60s) stale-while-revalidate for fresh matches. `/` and `/games` (live section) hit this, not API directly. |
 | stats_engine.py | Storage, aggregation, detect_errors, merge_games, get_game_by_match_id, in-memory indexes (_match_id_index, _hero_index). Private `_load_games`/`_save_games` — use public API. |
 | macro_analyzer.py | Match analysis vs Legend benchmarks (GPM/XPM/LH, deaths, damage). Single request per match. |
 | report_generator.py | Text/markdown reports from macro analysis. |
@@ -98,7 +98,7 @@ OpenDota API -> fetcher.py/web_fetcher.py -> stats_engine.save_matches()
 | / | index.html | global stats, fresh matches (from TTL cache), top heroes |
 | /hero/<hero> | hero.html | hero stats, games, strategy report |
 | /games | games.html | paginated match list |
-| /fresh | fresh.html | live matches from TTL cache |
+| /fresh | — | 302 redirect to /games#live (page merged into /games) |
 | /match/<id> | match_detail.html | full analysis, draft, skill build, items, MVP |
 | /errors | errors.html | games with detect_errors flags |
 | /macro | macro.html | aggregate macro analysis |

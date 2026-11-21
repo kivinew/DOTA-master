@@ -76,7 +76,7 @@ API: `GET /api/games?page=1&per_page=50` (пагинация, `per_page` ≤ 200
 - `macro_analyzer.py` + `report_generator.py` — макро-анализ свежих матчей vs бенчмарки ранга (GPM/XPM/LH, смерти, урон) и текстовые отчёты с трендами.
 - `web_fetcher.py` + `fetcher.py` — загрузка матчей из OpenDota API (recentMatches + детали `/matches/{id}`, дедупликация по `match_id`).
 - `http.py` — единый HTTP-клиент обоих fetcher'ов (`urllib` + retry на 429/сеть).
-- `fresh_cache.py` — TTL-кэш (60 c) свежих матчей: страница `/` и `/fresh` не ждут API, протухшее отдаётся сразу с фоновым обновлением.
+- `fresh_cache.py` — TTL-кэш (60 c) свежих матчей: страницы `/` и `/games` (секция «Свежие матчи») не ждут API, протухшее отдаётся сразу с фоновым обновлением.
 - `auto_update.py` — фоновое обновление `games.json` каждые N минут, состояние в `games/.auto_update_state.json`.
 
 ## Запуск

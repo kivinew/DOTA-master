@@ -106,7 +106,7 @@
     {% endfor %}
     {% if fresh_matches|length > 10 %}
     <div class="tc mt-sm">
-        <a href="/fresh" class="btn btn-primary">Все {{ fresh_matches|length }} матчей →</a>
+        <a href="/games#live" class="btn btn-primary">Все {{ fresh_matches|length }} матчей →</a>
     </div>
     {% endif %}
 </div>
@@ -144,7 +144,7 @@
         <span class="mono">api.opendota.com</span>.
         {% endif %}
         <div class="mt-sm">
-            <a href="/fresh?refresh=1" class="btn btn-primary">🔄 Загрузить матчи</a>
+            <a href="/games?refresh=1#live" class="btn btn-primary">🔄 Загрузить матчи</a>
             <a href="/games" class="btn">📋 Все игры</a>
         </div>
     </div>

@@ -308,3 +308,42 @@ def test_games_today_shortcut_uses_local_player_time():
     # Имена героев есть и в выпадающем списке фильтра — проверяем блок таблицы.
     table = filtered.split("<tbody>", 1)[1].split("</tbody>", 1)[0]
     assert "Pugna" in table and "Axe" not in table
+
+
+def test_fresh_page_redirects_to_games_live_section():
+    """/fresh объединён с /games: старый адрес ведёт на секцию живых матчей."""
+    client = _client()
+    plain = client.get("/fresh")
+    assert plain.status_code == 302
+    assert plain.headers["Location"].endswith("/games#live")
+
+    refresh = client.get("/fresh?refresh=1")
+    assert refresh.status_code == 302
+    assert refresh.headers["Location"].endswith("/games?refresh=1#live")
+
+
+def test_games_page_contains_live_matches_section(monkeypatch):
+    """На /games есть секция живых матчей (бывшая /fresh) и история."""
+    monkeypatch.setattr(webapp, "load_fresh_matches", lambda: {
+        "fresh_matches": [{
+            "hero": "Pugna", "match_id": "770000001", "time_ago": "5 мин назад",
+            "result": "win", "K": 9, "D": 2, "A": 14, "duration": "40:00",
+            "side": "Radiant", "game_mode": 22, "date": "2026-11-21 18:00",
+        }],
+        "account_id": 41099157, "live": True,
+    })
+    body = _client().get("/games").get_data(as_text=True)
+    assert "Свежие матчи из OpenDota (1)" in body
+    assert "Живой ответ OpenDota" in body
+    assert "770000001" in body
+    assert "/games?refresh=1#live" in body
+    # история из базы тоже на месте
+    assert "match-row-clickable" in body
+
+
+def test_navigation_has_no_separate_fresh_entry():
+    """В меню больше нет отдельного пункта «Свежие» — страница объединена."""
+    html = _client().get("/games").get_data(as_text=True)
+    nav = html.split('<nav class="nav-bar">', 1)[1].split("</nav>", 1)[0]
+    assert "/fresh" not in nav
+    assert 'href="/games' in nav

@@ -5,11 +5,11 @@
 ## Структура
 
 - `main.py` — CLI: `add`, `import <csv>`, `report`, `hero <name>`, `list`, `errors`, `fetch`, `fetch-heroes`, `auto-update start|stop|status`
-- `app.py` — Flask app. Страницы: `/`, `/games`, `/fresh`, `/errors`, `/macro`, `/report`, `/heroes`, `/hero/<name>`, `/match/<id>`, `/api`, `/healthz`. Запуск через `run_simple`, без reloader/debugger
+- `app.py` — Flask app. Страницы: `/`, `/games` (история + живые матчи, бывшая `/fresh` — редирект на `/games#live`), `/errors`, `/macro`, `/report`, `/heroes`, `/hero/<name>`, `/match/<id>`, `/api`, `/healthz`. Запуск через `run_simple`, без reloader/debugger
 - `analysis/stats_engine.py` — хранилище `games/games.json`, `add_game`, `import_csv`, `merge_games` (дедуп по `match_id`/CSV-ключу), `global_stats`, `hero_stats`, `detect_errors`, `analyze_all_games`, `get_game_by_match_id`, in-memory indexes (`_match_id_index`, `_hero_index`)
 - `analysis/config.py` — единый конфиг через env (`DOTA_ACCOUNT_ID`, `PORT`, `DOTA_UPDATE_INTERVAL`, `DOTA_MAX_MATCHES`, `DOTA_MASTER_SECRET`, `DOTA_STEAM_ID64`); использовать его, не хардкодить
 - `analysis/http.py` — единый HTTP-клиент (`fetch_json` с retry); новый сетевой код — только через него
-- `analysis/fresh_cache.py` — TTL-кэш (60 c) свежих матчей, stale-while-revalidate; страницы `/`, `/fresh` идут через него, не напрямую в API
+- `analysis/fresh_cache.py` — TTL-кэш (60 c) свежих матчей, stale-while-revalidate; страницы `/` и `/games` (секция живых матчей) идут через него, не напрямую в API
 - `analysis/fetcher.py` — OpenDota API (`urllib`, без внешних зависимостей): `get_player_matches`, `normalize_open_dota_match`, `save_matches`, `resolve_steam_profile`, `get_heroes_list`. Дедупликация по `match_id`
 - `analysis/web_fetcher.py`, `analysis/macro_analyzer.py`, `analysis/report_generator.py` — свежие матчи, макро-анализ, отчёты (`analyze_match` для детали матча)
 - `analysis/hero_strategies.py` — стратегии победы по героям
