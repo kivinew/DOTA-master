@@ -1,0 +1,4 @@
+@echo off
+echo test1
+ping -n 2 127.0.0.1 >nul
+echo test2
