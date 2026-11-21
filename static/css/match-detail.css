@@ -92,3 +92,9 @@
     .match-hero-portrait { width: 82px; height: 82px; }
     .match-kda-highlight { flex-wrap: wrap; gap: .35rem .5rem; }
 }
+
+/* Счёт команды в шапке Radiant/Dire должен помещаться и на узких экранах. */
+@media (max-width: 430px) {
+    .draft-label { padding: 4px 8px; }
+    .draft-label-score { margin-left: 4px; padding-left: 6px; font-size: .78rem; }
+}

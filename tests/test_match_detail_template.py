@@ -6,7 +6,7 @@ from flask import render_template
 from app import app
 
 
-def test_match_detail_has_one_score_compact_counter_and_item_fallback():
+def test_match_detail_score_lives_in_team_header():
     match = {
         "match_id": 9098079575, "hero_name": "Invoker", "hero_id": 74,
         "result": "win", "radiant_win": True, "radiant_score": 24, "dire_score": 18,
@@ -31,7 +31,12 @@ def test_match_detail_has_one_score_compact_counter_and_item_fallback():
             counter_list=["Axe"], primary="Axe",
         )
 
-    assert html.count("final-score") == 1
+    # Отдельного блока «Счет» больше нет — счёт живёт в шапке Radiant/Dire.
+    assert "final-score" not in html
+    assert 'class="dota-section-title">Счет' not in html
+    assert html.count('draft-label-score">24') == 1
+    assert html.count('draft-label-score">18') == 1
+    assert html.index("RADIANT") < html.index('draft-label-score">24')
     assert "МОЙ KDA" in html and "KDA 7.0" in html
     assert "KDA 3.0" in html
     assert "counter-matchup" in html

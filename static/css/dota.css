@@ -1,4 +1,4 @@
-﻿/* =========================================================================
+/* =========================================================================
    DOTA_MASTER - единая тема оформления (стиль Dota 2)
    -------------------------------------------------------------------------
    Один файл CSS для всех страниц. Собран из прежних inline-стилей
@@ -1877,40 +1877,17 @@ a.dota-logo:hover .dota-logo-text {
     color: var(--dota-text-muted);
     flex-shrink: 0;
 }
-.draft-score {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    padding: 4px 16px 16px;
-}
-.final-score .team-score {
-    font-size: 2.4rem;
-}
-.team-score {
-    font-size: 2rem;
+/* Итоговый счёт команды в шапке драфта: Radiant — Dire. */
+.draft-label-score {
+    margin-left: 6px;
+    padding-left: 8px;
+    border-left: 1px solid currentColor;
+    font-size: 0.85rem;
     font-weight: 800;
-    line-height: 1;
+    letter-spacing: 0;
 }
-.team-score.radiant {
-    color: #6adf5a;
-}
-.team-score.dire {
-    color: #e05050;
-}
-.team-score.radiant.won {
-    color: #6adf5a;
-    text-shadow: 0 0 14px rgba(106, 223, 90, 0.55);
-}
-.team-score.dire.won {
-    color: #e05050;
-    text-shadow: 0 0 14px rgba(224, 80, 80, 0.55);
-}
-.score-vs {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--dota-text-muted);
-}
+.draft-label.radiant .draft-label-score { color: #6adf5a; }
+.draft-label.dire .draft-label-score { color: #e05050; }
 .draft-teams {
     display: grid;
     grid-template-columns: 1fr 1fr;
