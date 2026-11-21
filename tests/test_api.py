@@ -53,20 +53,57 @@ def test_match_page_fetches_details_only_once(monkeypatch):
     assert calls == [9098079575]
 
 
+@pytest.mark.parametrize(("enemy_hero_id", "expected_counter"), [(2, None), (1, "Anti-Mage")])
+def test_match_counterpick_must_be_on_enemy_roster(monkeypatch, enemy_hero_id, expected_counter):
+    from analysis import macro_analyzer
+
+    details = {"players": [
+        {"account_id": webapp.ACCOUNT_ID, "player_slot": 0, "hero_id": 45},
+        {"account_id": 123, "player_slot": 128, "hero_id": enemy_hero_id},
+    ], "picks_bans": []}
+    monkeypatch.setattr(stats_engine, "get_games", lambda: [])
+    monkeypatch.setattr(macro_analyzer, "get_match_details", lambda match_id: details)
+    monkeypatch.setattr(macro_analyzer, "analyze_match", lambda *args, **kwargs: {"hero_name": "Pugna"})
+    monkeypatch.setattr(webapp, "render_template", lambda template, **context: webapp.jsonify({
+        "counter_list": context["counter_list"], "primary": context["primary"]
+    }))
+
+    response = _client().get("/match/9098079575")
+    assert response.status_code == 200
+    if expected_counter:
+        assert response.json["counter_list"] == [expected_counter]
+        assert response.json["primary"] == expected_counter
+    else:
+        assert response.json["counter_list"] == []
+        assert response.json["primary"] is None
+
+
 def test_games_and_errors_pages_are_reachable():
     client = _client()
-    for path in ("/games", "/errors"):
+    for path in ("/games", "/games/", "/errors", "/errors/"):
         response = client.get(path)
         assert response.status_code == 200
         assert response.mimetype == "text/html"
+
+
+def test_games_and_errors_accept_legacy_incomplete_records(monkeypatch):
+    records = [{"match_id": "12345", "date": "2026-11-20", "hero": "Invoker",
+                "result": "loss", "K": "1", "D": "9", "A": "2"}]
+    monkeypatch.setattr(webapp, "get_games", lambda: records)
+    monkeypatch.setattr(stats_engine, "get_games", lambda: records)
+    client = _client()
+    assert client.get("/games").status_code == 200
+    errors = client.get("/errors")
+    assert errors.status_code == 200
+    assert "9 смертей" in errors.get_data(as_text=True)
 
 
 def test_dashboard_nav_has_no_pugna_shortcut(monkeypatch):
     monkeypatch.setattr(webapp, "load_fresh_matches", lambda: {"fresh_matches": [], "account_id": None})
     html = _client().get("/").get_data(as_text=True)
     nav = html.split("<nav class=\"nav-bar\">", 1)[1].split("</nav>", 1)[0]
-    assert 'href="/games"' in nav
-    assert 'href="/errors"' in nav
+    assert 'href="/games' in nav
+    assert 'href="/errors' in nav
     assert "/hero/Pugna" not in nav
 
 

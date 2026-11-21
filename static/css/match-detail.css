@@ -60,3 +60,35 @@
     .counter-matchup-hero small { font-size: .5rem; }
     .counter-matchup-hero img { width: 32px; height: 32px; flex-basis: 32px; }
 }
+
+/* Readable player KDA without enlarging the draft cards. */
+.match-kda-highlight {
+    display: inline-flex;
+    align-items: baseline;
+    gap: .55rem;
+    margin-top: .65rem;
+    padding: .42rem .7rem;
+    border: 1px solid var(--dota-border);
+    border-radius: 5px;
+    background: var(--dota-bg-card);
+}
+.match-kda-highlight > span { color: var(--dota-text-muted); font-size: .62rem; letter-spacing: .1em; }
+.match-kda-highlight strong { color: var(--dota-gold); font-size: 1.1rem; }
+.match-kda-highlight small { color: var(--dota-text-muted); font-size: .72rem; }
+.hero-kda {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    margin-top: 3px;
+    color: var(--dota-text-muted);
+    font-size: .62rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+.hero-kda b { color: var(--dota-gold); font-size: .64rem; font-weight: 700; }
+@media (max-width: 600px) {
+    .match-hero-header { align-items: flex-start; gap: .8rem; }
+    .match-hero-portrait { width: 82px; height: 82px; }
+    .match-kda-highlight { flex-wrap: wrap; gap: .35rem .5rem; }
+}

@@ -107,6 +107,7 @@ import analysis.auto_update as _au_module
 _au_module._is_running = _is_process_running
 
 import json
+import math
 import threading
 import time
 import logging
@@ -281,12 +282,48 @@ def load_fresh_matches():
     return {"fresh_matches": [], "account_id": None}
 
 
+def _safe_number(value, default=0):
+    """Convert possibly stale/imported metric values to finite numbers."""
+    try:
+        number = float(value)
+        if not math.isfinite(number):
+            return default
+        return int(number) if number.is_integer() else number
+    except (TypeError, ValueError, OverflowError):
+        return default
+
+
+def _normalize_game_record(record):
+    """Give old/manual match records the fields required by the web tables."""
+    if not isinstance(record, dict):
+        return None
+    game = dict(record)
+    game["hero"] = str(game.get("hero") or game.get("localized_name") or "Unknown hero").strip()
+    game["date"] = str(game.get("date") or "")
+    result = str(game.get("result") or "").strip().lower()
+    game["result"] = "win" if result in ("win", "won", "victory") else "loss"
+    game["role"] = str(game.get("role") or "")
+    game["game_mode"] = game.get("game_mode") or ""
+    game["notes"] = str(game.get("notes") or "")
+    game["match_id"] = _safe_number(game.get("match_id"), 0)
+    for field, aliases in {
+        "kills": ("kills", "K"), "deaths": ("deaths", "D"),
+        "assists": ("assists", "A"), "last_hits": ("last_hits", "lh"),
+        "gpm": ("gpm", "GPM"), "xpm": ("xpm", "XPM"),
+        "rotl": ("rotl", "RoTL"),
+    }.items():
+        value = next((game.get(key) for key in aliases if game.get(key) is not None), 0)
+        game[field] = _safe_number(value, 0)
+    return game
+
+
 def get_games_data(page: int = 1, per_page: int = 50,
                    hero_filter: str = None, result_filter: str = None,
                    date_from: str = None, date_to: str = None,
                    min_kda: float = None, max_kda: float = None):
     """Get paginated games with optional filters."""
-    games = get_games()
+    games = [normalized for record in get_games()
+             if (normalized := _normalize_game_record(record)) is not None]
 
     # Apply filters
     if hero_filter:
@@ -319,10 +356,13 @@ def get_games_data(page: int = 1, per_page: int = 50,
 
 
 def get_all_heroes():
-    """Get list of all unique heroes from games."""
-    games = get_games()
-    heroes = sorted(set(g.get("hero") for g in games if g.get("hero")))
-    return heroes
+    """Get list of all unique heroes from valid match records."""
+    heroes = {
+        str(game.get("hero")).strip()
+        for game in get_games()
+        if isinstance(game, dict) and game.get("hero")
+    }
+    return sorted(heroes)
 
 
 def get_top_heroes(limit=8):
@@ -530,9 +570,12 @@ def hero_page(hero):
         total_games=len(get_games()))
 
 
+@app.route("/errors/")
 @app.route("/errors")
 def errors_page():
-    games = sorted(get_games(), key=lambda g: (g.get("date", ""), g.get("match_id", 0)), reverse=True)
+    games = [normalized for record in get_games()
+             if (normalized := _normalize_game_record(record)) is not None]
+    games.sort(key=lambda g: (g.get("date", ""), g.get("match_id", 0)), reverse=True)
     errors_list = []
     for g in games:
         errs = detect_errors(g)
@@ -552,6 +595,7 @@ def errors_page():
         total_errors=len(errors_list))
 
 
+@app.route("/games/")
 @app.route("/games")
 def games_page():
     page_num = request.args.get("page", 1, type=int)
@@ -670,7 +714,7 @@ def match_detail_page(match_id):
     if not analysis:
         return "Матч не найден", 404
 
-    # Определить нашу команду (0=Radiant, 1=Dire) по account_id
+    # Определить сторону игрока (0=Radiant, 1=Dire).
     our_team = None
     if d:
         for pl in d.get("players", []):
@@ -678,26 +722,48 @@ def match_detail_page(match_id):
                 slot = pl.get("player_slot", -1)
                 our_team = 1 if slot >= 128 else 0
                 break
+    if our_team is None:
+        inferred_slot = player_slot
+        if inferred_slot is None and local_match:
+            inferred_slot = local_match.get("player_slot")
+        try:
+            if inferred_slot is not None:
+                our_team = 1 if int(inferred_slot) >= 128 else 0
+        except (TypeError, ValueError):
+            pass
+    if our_team is None and d and local_match and local_match.get("result") in ("win", "loss"):
+        # В старых записях мог сохраниться только результат и radiant_win.
+        if d.get("radiant_win") is not None:
+            our_team = 0 if ((local_match["result"] == "win") == bool(d["radiant_win"]) ) else 1
 
     picks_bans = d.get("picks_bans", []) if d else []
 
-    # Контрптик: герои, контрирующие твоего героя, выбранные из вражеской команды
-    _enemy_team = (1 - our_team) if our_team is not None else 0
+    # Показываем контрпики только если соответствующий герой действительно есть
+    # среди соперников этой игры. Не подставляем общий counter из базы вне матча.
     player_hero_name = analysis.get("hero_name", "")
-    _hero_counters = get_counter_heroes(player_hero_name)
-    _enemy_picks = [
-        p for p in picks_bans
-        if p.get("team") == _enemy_team and p.get("is_pick")
-    ]
-    _enemy_counters = [
-        p["hero_name"] for p in _enemy_picks
-        if p.get("hero_name") in _hero_counters
-    ]
-    if not _enemy_counters:
-        _enemy_counters = _hero_counters
-    _primary_counter = get_primary_counter(player_hero_name)
-    if _enemy_counters:
-        _primary_counter = _enemy_counters[0]
+    known_counters = {str(hero).casefold() for hero in get_counter_heroes(player_hero_name)}
+    enemy_team = 1 - our_team if our_team is not None else None
+    enemy_hero_names = []
+    if d and enemy_team is not None:
+        for pl in d.get("players", []):
+            slot = pl.get("player_slot", -1)
+            team = 0 if 0 <= slot <= 4 else 1 if 128 <= slot <= 132 else None
+            if team == enemy_team and pl.get("hero_id"):
+                enemy_hero_names.append(_hero_name(pl["hero_id"]))
+        for pick in picks_bans:
+            if pick.get("is_pick") and pick.get("team") == enemy_team:
+                hero_id = pick.get("hero_id")
+                if hero_id:
+                    enemy_hero_names.append(pick.get("hero_name") or _hero_name(hero_id))
+
+    _enemy_counters = list(dict.fromkeys(
+        name for name in enemy_hero_names if name and name.casefold() in known_counters
+    ))
+    preferred_counter = get_primary_counter(player_hero_name)
+    _primary_counter = next(
+        (name for name in _enemy_counters if name.casefold() == str(preferred_counter).casefold()),
+        _enemy_counters[0] if _enemy_counters else None,
+    )
 
     # Построить маппинг hero_id -> player data из players
     hero_to_player = {}

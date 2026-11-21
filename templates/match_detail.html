@@ -17,6 +17,11 @@
                 <span class="result-icon">💀</span> Поражение
             {% endif %}
         </div>
+        <div class="match-kda-highlight" aria-label="Мой KDA">
+            <span>МОЙ KDA</span>
+            <strong>{{ "%.1f"|format(match.kda|default(0, true)|float) }}</strong>
+            <small>{{ match.kills|default(0, true) }} / {{ match.deaths|default(0, true) }} / {{ match.assists|default(0, true) }}</small>
+        </div>
     </div>
 </div>
 
@@ -68,7 +73,13 @@
                             <span class="hero-position pos-{{ p.position }}">{{ p.position }}</span>
                             {% endif %}
                             <img src="{{ hero_img_url(p.hero_name) }}" class="draft-hero-img" title="{{ p.hero_name }}">
-                                                        <span class="hero-kda">({{ p.kills }}-{{ p.deaths }}-{{ p.assists }})</span>
+                                                        {% set player_kills = p.kills | default(0, true) | int %}
+                            {% set player_deaths = p.deaths | default(0, true) | int %}
+                            {% set player_assists = p.assists | default(0, true) | int %}
+                            <span class="hero-kda" title="Убийства / смерти / помощи">
+                                {{ player_kills }}/{{ player_deaths }}/{{ player_assists }}
+                                <b>KDA {{ "%.1f"|format((player_kills + player_assists) / max(player_deaths, 1)) }}</b>
+                            </span>
                                                         {% if match.hero_id == p.hero_id %}<span class="you-badge">Ты</span>{% endif %}
                             {% if p.hero_items %}
                             <div class="draft-hero-items">
@@ -103,7 +114,13 @@
                             <span class="hero-position pos-{{ p.position }}">{{ p.position }}</span>
                             {% endif %}
                             <img src="{{ hero_img_url(p.hero_name) }}" class="draft-hero-img" title="{{ p.hero_name }}">
-                                                        <span class="hero-kda">({{ p.kills }}-{{ p.deaths }}-{{ p.assists }})</span>
+                                                        {% set player_kills = p.kills | default(0, true) | int %}
+                            {% set player_deaths = p.deaths | default(0, true) | int %}
+                            {% set player_assists = p.assists | default(0, true) | int %}
+                            <span class="hero-kda" title="Убийства / смерти / помощи">
+                                {{ player_kills }}/{{ player_deaths }}/{{ player_assists }}
+                                <b>KDA {{ "%.1f"|format((player_kills + player_assists) / max(player_deaths, 1)) }}</b>
+                            </span>
                                                         {% if match.hero_id == p.hero_id %}<span class="you-badge">Ты</span>{% endif %}
                             {% if p.hero_items %}
                             <div class="draft-hero-items">
@@ -133,10 +150,8 @@
 </div>
 {% endif %}
 
-<!-- Компактная сводка контрпика -->
-{% set counter_list = counter_list or get_counter_heroes(match.hero_name) %}
-{% set primary = primary or get_primary_counter(match.hero_name) %}
-{% if counter_list %}
+<!-- Компактная сводка контрпика: только герои, присутствующие в матче -->
+{% if counter_list and primary %}
 <div class="dota-section counter-section">
     <div class="dota-section-title">🎯 Контрпик</div>
     <div class="counter-matchup">
@@ -165,6 +180,11 @@
         </div>
     </div>
     {% endif %}
+</div>
+{% else %}
+<div class="dota-section counter-section counter-empty">
+    <div class="dota-section-title">🎯 Контрпик</div>
+    <p class="muted">В составе соперника нет героя из списка контрпиков для {{ match.hero_name }}.</p>
 </div>
 {% endif %}
 
